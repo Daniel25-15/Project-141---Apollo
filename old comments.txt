@@ -1,0 +1,620 @@
+    # hit_info = player.intersects()
+    # if hit_info.hit and hit_info.entity == box:
+    #     print("HIT")
+    #     if player.y < box.y:
+    #         player.y = box.y - (box.scale_y / 2) - 1.5
+
+    # head_ray = raycast(player.position + Vec3(0, 1.5, 0), Vec3(0, 1, 0), distance=0.6, ignore=(player,))
+
+    # head_check = boxcast(
+    #     player.position + Vec3(0, 1.5, 0),
+    #     direction=Vec3(0, 1, 0),
+    #     distance=0.4,
+    #     thickness=(0.9, 0.9),
+    #     ignore=(player,)
+    # )
+
+    # if head_check.hit:
+    #     player.jump_duration = 0
+    #     player.fall_speed = 0
+    #     # player.y = head_check.point.y - 2.0
+    #     player.grounded = False
+    #     if player.y > 1.0:
+    #         player.y -= 2.0
+
+    # if player.jump_up_duration > 0:
+    #     head_check = raycast(player.position + Vec3(0, 1, 0), Vec3(0, 1, 0), distance=1.1, ignore=(player,))
+    #     if head_check.hit:
+    #         player.jump_up_duration = 0
+    #         player.fall_speed = 0
+    #         player.y = head_check.point.y - 2.0
+
+# box = Entity(
+#     model='cube',
+#     texture='white_cube',
+#     scale=(5, 5, 5),
+#     color=color.black,
+#     texture_scale=(5, 5),
+#     collider='box',
+#     # y=5,
+#     # x=20
+#     position=(0, 5, 5)
+# )
+
+                #    dummies.remove(hit_info.entity)
+
+
+
+
+
+
+##########################################
+
+
+
+
+
+from ursina import *
+from ursina.prefabs.first_person_controller import FirstPersonController
+import random
+
+app = Ursina()
+
+ground = Entity(
+    model='plane',
+    texture='white_cube',
+    scale=(100, 1, 100),
+    color=color.green,
+    texture_scale=(100, 100),
+    collider='box'
+)
+
+# player = FirstPersonController(
+#     speed=25,
+#     ceiling_raycast=True
+# )
+
+class RebuiltFirstPersonController(FirstPersonController):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.gravity = 0 
+        self.velocity_y = 0
+        self.jump_force = 12
+        self.gravity_strength = 35
+    def input(self, key):
+        if key == "space" and self.grounded:
+            self.velocity_y = self.jump_force
+            self.grounded = False
+            return
+        super().input(key)
+    def update(self):
+        super().update()
+
+        if not self.grounded:
+            self.velocity_y -= self.gravity_strength * time.dt
+        else:
+            self.velocity_y = max(0, self.velocity_y)
+        self.y += self.velocity_y * time.daylight
+
+
+
+        # if hasattr(self, 'jumping') and self.jumping:
+        ceiling_hit = boxcast(
+            self.world_position + Vec3(0, self.height, 0),
+            direction=Vec3(0, 1, 0),
+            distance=0.3,
+            thickness=(0.8, 0.8),
+            ignore=(self,)
+        )
+        if ceiling_hit.hit and self.velocity_y > 0:
+            self.velocity_y = 0
+            self.y = ceiling_hit.point.y - self.height
+# player = RebuiltFirstPersonController(
+#     speed = 25
+# )
+
+
+
+menu = Entity(
+    parent=camera.ui,
+    model="quad",
+    color=color.white,
+    scale=(0.6, 0.3),
+    z=-0.1,
+    enabled=False,
+    
+)
+menu.collider = None
+quit_button = Button(
+    text="Escape",
+    color=color.green,
+    scale=(0.6, 0.2),
+    y=0,
+    parent=menu,
+    z=-0.01
+)
+
+
+
+class Wall():
+    def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all,rotation_def):
+        self.entity = Entity(
+            model=model_type,
+            texture=texture_type,
+            scale=scale_def,
+            color=color_def,
+            texture_scale=texture_scale_def,
+            collider=collider_type,
+            position=position_all,
+            # rotation_x=rotation_def
+            rotation=rotation_def
+        )
+
+Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (2.5, 4.5, 5.5), (90, 0, 0))
+Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (7.5, 4.5, 9.5), (0, 90, 0))
+Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (11.5, 4.5, 5.5), (90, 0, 0))
+
+
+bullets_1 = []
+bullets_2 = []
+bullets_3 = []
+dummies = []
+
+gun_NoModel = Entity(parent=camera, model='cube', color=color.black, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
+gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
+gun_NoModel_3 = Entity(parent=camera, model='cube', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
+gun_NoModel_2.enabled = False
+gun_NoModel_3.enabled = False
+
+player = FirstPersonController(
+    speed = 25,
+    model='cube',
+    y=0
+)
+
+player.gun_1 = gun_NoModel
+player.gun_2 = gun_NoModel_2
+player.gun_3 = gun_NoModel_3
+
+# x, y, z = 5, 5, 6
+
+def generate_dummies():
+    for i in range(9):
+        x = random.choice([3, 4, 5, 6, 9])
+        y = random.choice([3, 4, 5, 6, 9])
+        z = random.choice([3, 4, 5, 6, 9])
+
+        dummy = Entity(model='cube', color=color.white,texture='target.png',scale=(1,1,0.1),dx=0.05, position=(x,y,z), collider='box')
+        dummies.append(dummy)
+generate_dummies()
+
+quit_button.on_click = application.quit
+escape_menu_toggle = False
+# quit_button.enabled = escape_menu_toggle
+
+def final_menu():
+    global escape_menu_toggle
+    escape_menu_toggle = True
+
+    escape_menu_toggle = not escape_menu_toggle
+    mouse.locked = not escape_menu_toggle
+    player.enabled = not escape_menu_toggle
+
+    if 'win_message' in globals():
+        destroy(win_message)
+
+weapon = 1
+
+def input(key):
+    global escape_menu_toggle, weapon
+    if key == 'escape':
+        escape_menu_toggle = not escape_menu_toggle
+        mouse.locked = not escape_menu_toggle
+        player.enabled = not escape_menu_toggle
+        # quit_button.enabled = not escape_menu_toggle
+        menu.enabled = escape_menu_toggle
+
+    if key == 'left mouse down' and player.gun_1 or key == 'left mouse down' and player.gun_2:
+        # bullet = Entity(parent=gun_NoModel, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+        # bullet = Entity(parent=camera, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+        if weapon == 1:
+        
+            bullet_1 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                # position=(0, 0.5, 0),
+                # position=gun_NoModel.world_position + gun_NoModel.forward,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.red,
+                collider='box'
+                )
+            bullet_1.rotation = camera.world_rotation
+            bullets_1.append(bullet_1)
+            gun_NoModel.blink(color.white)
+            # bullet.world_parent = scene
+            # bullet.world_rotation = gun_NoModel.world_rotation
+        elif weapon == 2:
+            bullet_2 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                # position=(0, 0.5, 0),
+                # position=gun_NoModel.world_position + gun_NoModel.forward,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.green,
+                collider='box'
+                )
+            bullet_2.rotation = camera.world_rotation
+            bullets_2.append(bullet_2)
+            gun_NoModel_2.blink(color.white)
+        elif weapon == 3:
+            bullet_3 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                # position=(0, 0.5, 0),
+                # position=gun_NoModel.world_position + gun_NoModel.forward,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.red,
+                collider='box'
+                )
+            bullet_3.rotation = camera.world_rotation
+            bullets_3.append(bullet_3)
+            gun_NoModel_3.blink(color.white)
+    if key == '1':
+        print("weapon 1 ")
+        weapon = 1
+        gun_NoModel.enabled = True
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = False
+    if key == '2':
+        print("weapon 2 ")
+        weapon = 2
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = True
+        gun_NoModel_3.enabled = False
+    if key == '3':
+        print("weapon 3 ")
+        weapon = 3
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = True
+
+def update():
+    if held_keys["shift"]:
+        player.speed = 35
+    else:
+        player.speed = 25
+
+    global bullets_1, weapon
+    destroyEntitiesDummy = []
+    destroyEntitiesBullet = []
+    # bullet_speed = 120
+    
+    bullet_speed_1, bullet_speed_2, bullet_speed_3 = 120, 150, 200
+
+    # if len(bullets) > 0:
+    if weapon == 1:
+        for b in bullets_1:
+            # b.position += b.forward * 8
+            # b.position += b.forward * 5
+            # b.position += b.forward * 40 * time.dt
+
+            distThisFrame = bullet_speed_1 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+
+
+            # * time.dt
+            # hit_info = b.intersects()
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_1:
+                bullets_1.remove(b)
+                destroy(b)
+    elif weapon == 2:
+        for b in bullets_2:
+            # b.position += b.forward * 8
+            # b.position += b.forward * 5
+            # b.position += b.forward * 40 * time.dt
+
+            distThisFrame = bullet_speed_2 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+
+
+            # * time.dt
+            # hit_info = b.intersects()
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_2:
+                bullets_2.remove(b)
+                destroy(b)
+    elif weapon == 3:
+        for b in bullets_3:
+            # b.position += b.forward * 8
+            # b.position += b.forward * 5
+            # b.position += b.forward * 40 * time.dt
+
+            distThisFrame = bullet_speed_3 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+
+
+            # * time.dt
+            # hit_info = b.intersects()
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_3:
+                bullets_3.remove(b)
+                destroy(b)
+
+            #    destroy(hit_info.entity)
+    if len(dummies) == 0:
+    #    print("WIN")
+        # message = Text(text = 'DONE', scale=2, origin=(0,0), background=True, color=color.blue)
+        # application.pause()
+
+        # mouse.locked = not escape_menu_toggle
+        # player.enabled = not escape_menu_toggle
+        # time.sleep(1.5)
+        # destroy(message)
+        # menu.enabled = escape_menu_toggle
+
+        generate_dummies()
+
+        # global win_message
+        # if 'win_message' not in globals() or win_message not in scene.entities:
+            # win_message = Text(text = 'DONE', scale=2, origin=(0,0), background=True, color=color.blue)
+            
+            # mouse.locked = True
+            # player.enabled = False
+            # invoke(final_menu, delay=1.5)
+
+            # destroy(win_message)
+            # invoke(final_menu, delay=1.5)
+
+app.run()
+
+
+
+
+
+
+
+
+
+if held_keys["control"] or held_keys["left control"]:
+        print("Crouch")
+        # if player.height == 2.0:
+        #     player.height = 1.0
+        #     player.y -= 0.5
+        #     print(f"PLAYER HEIGHT: {player.height}") 
+        # player.height = 1
+
+        camera.y = 1
+    else:
+    #     if player.height == 1.0:
+    #         player.height = 2.0
+    #         player.y += 0.5
+        # player.height = 2
+        camera.y = 1
+
+
+
+
+
+
+
+
+global bullets_1, weapon
+    destroyEntitiesDummy = []
+    destroyEntitiesBullet = []
+    
+    GlobalBulletSpeed = 400
+
+    bullet_speed_1, bullet_speed_2, bullet_speed_3 = GlobalBulletSpeed, GlobalBulletSpeed, GlobalBulletSpeed
+
+    if weapon == 1:
+        for b in bullets_1:
+            distThisFrame = bullet_speed_1 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_1:
+                bullets_1.remove(b)
+                destroy(b)
+    elif weapon == 2:
+        for b in bullets_2:
+            distThisFrame = bullet_speed_2 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_2:
+                bullets_2.remove(b)
+                destroy(b)
+    elif weapon == 3:
+        for b in bullets_3:
+            distThisFrame = bullet_speed_3 * time.dt
+
+            hit_info = raycast(b.world_position, b.forward, distance=distThisFrame, ignore=(b, player))
+            if hit_info.hit:
+                if hit_info.entity in dummies:
+                    destroyEntitiesDummy.append(hit_info.entity)
+                    destroyEntitiesBullet.append(b)
+                    break
+            else:
+                b.position += b.forward * distThisFrame
+        for d in destroyEntitiesDummy:
+            if d in dummies:
+                dummies.remove(d)
+                destroy(d)
+        for b in destroyEntitiesBullet:
+            if b in bullets_3:
+                bullets_3.remove(b)
+                destroy(b)
+
+
+
+
+
+
+
+
+def input(key):
+    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3
+    if key == 'escape':
+        escape_menu_toggle = not escape_menu_toggle
+        mouse.locked = not escape_menu_toggle
+        player.enabled = not escape_menu_toggle
+        # quit_button.enabled = not escape_menu_toggle
+        menu.enabled = escape_menu_toggle
+
+
+#                                                or key == 'left mouse down' and player.gun_2
+    if key == 'left mouse down' and player.gun_1 :
+        # bullet = Entity(parent=gun_NoModel, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+        # bullet = Entity(parent=camera, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+        if weapon == 1 and mag_1 > 0:
+            bullet_1 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.red,
+                collider='box'
+                )
+            bullet_1.rotation = camera.world_rotation
+            bullets_1.append(bullet_1)
+            gun_NoModel.blink(color.white)
+
+            mag_1 -= 1
+            print(mag_1)
+        elif weapon == 2 and mag_2 > 0:
+            bullet_2 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.green,
+                collider='box'
+                )
+            bullet_2.rotation = camera.world_rotation
+            bullets_2.append(bullet_2)
+            gun_NoModel_2.blink(color.white)
+
+            mag_2 -= 1
+            print(mag_2)
+        elif weapon == 3 and mag_3 > 0:
+            bullet_3 = Entity(
+                parent=scene,
+                model='cube',
+                scale=.1,
+                position=camera.world_position + gun_NoModel.forward,
+                speed = 3,
+                color=color.red,
+                collider='box'
+                )
+            bullet_3.rotation = camera.world_rotation
+            bullets_3.append(bullet_3)
+            gun_NoModel_3.blink(color.white)
+            mag_3 -= 1
+            print(mag_3)
+    if key == 'right mouse down' and player.gun_3:
+        # print("RIGHT BUTTON")
+        camera.z = 5
+    if key == 'right mouse up' and player.gun_3:
+        # print("RIGHT BUTTON")
+        camera.z = 0
+    if key == '1':
+        print("weapon 1 ")
+        weapon = 1
+        gun_NoModel.enabled = True
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = False
+    if key == '2':
+        print("weapon 2 ")
+        weapon = 2
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = True
+        gun_NoModel_3.enabled = False
+    if key == '3':
+        print("weapon 3 ")
+        weapon = 3
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = True
+    # if key == "control":
+    #     print("Crouch")
+    #     player.camera_pivot.y -= 1
+    if key == 'control' or key == 'left control':
+        camera.y = -0.5
+    if key == 'control up' or key == 'left control up':
+        camera.y = 0
+    if key == 'z':
+        dash(5)
+    if key == 'r':
+        if weapon == 1:
+            mag_1 = 10
+    if weapon == 2:
+            mag_2 = 15
+    if weapon == 3:
+            mag_3 = 25
