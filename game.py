@@ -77,7 +77,14 @@ quit_button = Button(
     parent=menu,
     z=-0.01
 )
-
+return_button = Button(
+    text="return",
+    color=color.green,
+    scale=(0.6, 0.2),
+    y=0.25,
+    parent=menu,
+    z=-0.01
+)
 
 
 class Wall():
@@ -107,11 +114,14 @@ mag_1 = 10
 mag_2 = 15
 mag_3 = 25
 
+fireRate3 = 0.1
+cooldown_timer = 0.0
+
 dummies = []
 
-gun_NoModel = Entity(parent=camera, model='cube', color=color.black, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
+gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), collider='box')
 gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
-gun_NoModel_3 = Entity(parent=camera, model='cube', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
+gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), collider='box')
 gun_NoModel_2.enabled = False
 gun_NoModel_3.enabled = False
 
@@ -136,9 +146,17 @@ def generate_dummies():
         dummy = Entity(model='cube', color=color.white,texture='target.png',scale=(1,1,0.1),dx=0.05, position=(x,y,z), collider='box')
         dummies.append(dummy)
 generate_dummies()
+escape_menu_toggle = False
+
+def return_to_game():
+    global escape_menu_toggle
+    escape_menu_toggle = not escape_menu_toggle
+    mouse.locked = not escape_menu_toggle
+    player.enabled = not escape_menu_toggle
+    menu.enabled = False
 
 quit_button.on_click = application.quit
-escape_menu_toggle = False
+return_button.on_click = return_to_game
 # quit_button.enabled = escape_menu_toggle
 
 def final_menu():
@@ -153,14 +171,15 @@ def final_menu():
         # destroy(win_message)
         pass
 
-def dash(MoveDistance):
+def dash(MoveDistance, raise_y):
     MoveDistance
     dashHitInfo = raycast(player.position + Vec3(0, 1, 0), player.forward, distance=MoveDistance, ignore=(player,))
     if dashHitInfo.hit:
         finalMoveDistance = dashHitInfo.distance - 0.5
     else:
         finalMoveDistance = MoveDistance
-        player.y += 3
+        if raise_y == 1:
+            player.y += 3
 
     targetPosition = player.position + (player.forward * finalMoveDistance)
     player.animate_position(targetPosition, duration=0.1, curve=curve.linear)
@@ -222,11 +241,9 @@ def input(key):
             gun_NoModel_2.blink(color.white)
             mag_2 -= 1
             print(mag_2)
-        elif weapon == 3 and mag_3 > 0:
-            Bullet(color.red, position=camera.world_position + gun_NoModel_3.forward, rotation=camera.world_rotation)
-            gun_NoModel_3.blink(color.white)
-            mag_3 -= 1
-            print(mag_3)
+        elif weapon == 3:
+            pass
+        
     if key == 'right mouse down' and player.gun_3:
         # print("RIGHT BUTTON")
         camera.z = 5
@@ -259,7 +276,9 @@ def input(key):
     if key == 'control up' or key == 'left control up':
         camera.y = 0
     if key == 'z':
-        dash(15)
+        dash(15, 1)
+    if key == 'v':
+        dash(15, 0)
     if key == 'r':
         if weapon == 1:
             mag_1 = 10
@@ -272,10 +291,24 @@ print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
 
 def update():
+    global mag_3, cooldown_timer, fireRate3
     if held_keys["shift"]:
         player.speed = 35
     else:
         player.speed = 25
+
+    if cooldown_timer > 0:
+        cooldown_timer -= time.dt
+    
+
+    if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
+        if cooldown_timer <=0:
+            Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
+            gun_NoModel_3.blink(color.white)
+            mag_3 -= 1
+            print(mag_3)
+            cooldown_timer = fireRate3
+
 
     if player.y <= -25:
         print("TERRAIN TERRAIN")
