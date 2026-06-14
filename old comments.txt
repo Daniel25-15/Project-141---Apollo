@@ -722,11 +722,14 @@ def generateFollowerEntity(x, y, z, scale_var):
             moveVector = playerDirection
 
 
+position= (0.5, -1.5, 2.5)
+rotation=(0, -90, 0)
+
 
 git add .
 git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added the abilty to remove the Followers when they get hit with a bullet from the bullet class, and generates new followers when the followers list is less then or equal to 0."
+git commit -m "Updated the ADS (Aim Down Sights) functions, by changing the positions for each gun model"
 git push

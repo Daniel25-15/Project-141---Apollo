@@ -234,13 +234,13 @@ def generateFollower():
     for i in range(3):
         spawn_x = 5 + (i * 5)
         follower = Entity(
-            model="FollowerModel3.glb",
-            scale=(scale_var, scale_var, scale_var),
+            model="character",
+            scale=1, #(scale_var, scale_var, scale_var)
             position=(spawn_x, 0, 0),
             collider="box",
             # shader=lit_with_shadows_shader,
             # color=color.black,
-            texture="modelTexture"
+            # texture="newmodel.png"
         )
         followers.append(follower)
         generateNewFollowerToggle = False
@@ -369,8 +369,22 @@ def input(key):
         
     if key == 'right mouse down' and player.gun_3:
         camera.z = 5
+        if weapon == 1:
+            gun_NoModel.position = (0.25, -1.5, 2.5)
+        if weapon == 2:
+            gun_NoModel_2.position = (0.25, -1.5, 2.5)
+        if weapon == 3:
+            gun_NoModel_3.position = (0.15, -1, 2.5)
+            gun_NoModel_3.rotation =(0, -87, 0)
     if key == 'right mouse up' and player.gun_3:
         camera.z = 0
+        if weapon == 1:
+            gun_NoModel.position = (1.5, -1.5, 2.5)
+        if weapon == 2:
+            gun_NoModel_2.position = (2, -1, 2.5)
+        if weapon == 3:
+            gun_NoModel_3.position = (2, -1, 2.5)
+            gun_NoModel_3.rotation =(0, -90, 0)
     if key == '1':
         weapon = 1
     if key == '2':
