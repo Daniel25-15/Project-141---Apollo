@@ -146,6 +146,7 @@ fireRate3 = 0.05
 cooldown_timer = 0.0
 
 dummies = []
+followers = []
 
 gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), collider=None, overlay=True,)
 gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider=None, overlay=True,)
@@ -225,52 +226,25 @@ generate_dummies()
 escape_menu_toggle = False
 admin_menu_toggle = False
 
-def generateFollowerEntity(x, y, z, scale_var):
-    follower = Entity(
-        model="FollowerModelFixed.glb",
-        scale=(scale_var, scale_var, scale_var),
-        position=(x, y, z),
-        collider="box",
-        # shader=lit_with_shadows_shader,
-        texture=None,
-        rotation=(0, 90, 0)
-    )
 
 # generateFollowerEntity(3, 0, 0, 1)
 scale_var = 1
-follower = Entity(
-    model="FollowerModel3.glb",
-    scale=(scale_var, scale_var, scale_var),
-    position=(3, 0, 0),
-    collider="box",
-    shader=lit_with_shadows_shader,
-    texture="white_cube"
-)
+def generateFollower():
+    for i in range(3):
+        spawn_x = 5 + (i * 5)
+        follower = Entity(
+            model="FollowerModel3.glb",
+            scale=(scale_var, scale_var, scale_var),
+            position=(spawn_x, 0, 0),
+            collider="box",
+            shader=lit_with_shadows_shader,
+            texture="white_cube"
+        )
+        followers.append(follower)
 
-def followerUpdate():
-    global global_health
-    playerDirection = player.position - follower.position
-    if playerDirection.length() > 1.5:
-        playerDirection = playerDirection.normalized()
-        follower.position += playerDirection * time.dt * 3
-        follower.look_at(player)
-        follower.rotation_x = 0
-        follower.rotation_z = 0
-        follower.rotation_y += 90
+generateFollower()
 
-        # followerHitInfo = follower.intersects(traverse_target=player)
-        # if followerHitInfo.hit:
-        #     
-        if distance(follower, player) < 1.5:
-            global_health -= 10
-            print(f"DAMAGED HEALTH: {global_health}")
-            UI_Health_Counter.text = f"Health: {global_health}"
 
-        # followerHitInfo = follower.intersects()
-        # if followerHitInfo.hit and followerHitInfo.entity == player:
-        #     print("The follower hit the player!")
-
-follower.update = followerUpdate
 
 def return_to_game():
     global escape_menu_toggle
@@ -337,6 +311,10 @@ class Bullet(Entity):
                 destroy(hit_info.entity)
                 global_score += 1
                 UI_Score_Counter.text = f"Score: {global_score}"
+            # elif hit_info.entity in followers: 
+            #     followers.remove(hit_info.entity)
+            #     global_score += 1
+            #     UI_Score_Counter.text = f"Score: {global_score}"
             destroy(self)
         else:
             self.position += self.forward * distThisFrame
@@ -415,7 +393,7 @@ print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
 
 def update():
-    global mag_3, cooldown_timer, fireRate3, weapon
+    global mag_3, cooldown_timer, fireRate3, weapon, global_health
     if held_keys["shift"]:
         player.speed = 35
     else:
@@ -468,7 +446,24 @@ def update():
             # dummy.look_at(targetDummyPos)
             # dummy.look_at(player)
             pass
-
+    
+    for f in followers:
+        playerDirection = player.position - f.position
+        if playerDirection.length() > 1.5:
+            playerDirection = playerDirection.normalized()
+            f.position += playerDirection * time.dt * 3
+            f.look_at(player)
+            f.rotation_x = 0
+            f.rotation_z = 0
+            f.rotation_y += 90
+            if distance(f, player) < 1.5:
+                global_health -= 10
+                print(f"DAMAGED HEALTH: {global_health}")
+                UI_Health_Counter.text = f"Health: {global_health}"
+                # player.position += playerDirection * -2
+        if f.y <= -25:
+            print("FELL OFF")
+            f.y = 0
     if player.y <= -25:
         print("TERRAIN TERRAIN")
         handleDeath()

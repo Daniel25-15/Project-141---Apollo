@@ -680,11 +680,51 @@ Sir, I've analyzed the current features of your game and would like to suggest t
 
 These features should enhance the overall gameplay experience and provide a more engaging and challenging environment for players, Sir.
 
+def generateFollowerEntity(x, y, z, scale_var):
+    follower = Entity(
+        model="FollowerModelFixed.glb",
+        scale=(scale_var, scale_var, scale_var),
+        position=(x, y, z),
+        collider="box",
+        # shader=lit_with_shadows_shader,
+        texture=None,
+        rotation=(0, 90, 0)
+    )
+
+
+
+
+# def followerUpdate():
+#     global global_health
+#     playerDirection = player.position - follower.position
+#     if playerDirection.length() > 1.5:
+#         playerDirection = playerDirection.normalized()
+#         follower.position += playerDirection * time.dt * 3
+#         follower.look_at(player)
+#         follower.rotation_x = 0
+#         follower.rotation_z = 0
+#         follower.rotation_y += 90
+
+#         # followerHitInfo = follower.intersects(traverse_target=player)
+#         # if followerHitInfo.hit:
+#         #     
+#         if distance(follower, player) < 1.5:
+#             global_health -= 10
+#             print(f"DAMAGED HEALTH: {global_health}")
+#             UI_Health_Counter.text = f"Health: {global_health}"
+
+#         # followerHitInfo = follower.intersects()
+#         # if followerHitInfo.hit and followerHitInfo.entity == player:
+#         #     print("The follower hit the player!")
+
+# follower.update = followerUpdate
+
+
 
 git add .
 git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Fixed bugs with the health system, and the HandleDeath function. Added a 'Follower' entity with custom model. Added Follower AI. Follower AI will NEED to be update soon."
+git commit -m "Updated spawning of Followers, and gave them their own function for generating them. Added the ability to shoot at Followers, but disabled it because it is broken. Updated the Follower AI script, and fixed bugs that were added when generating more then 1 follower at a time."
 git push
