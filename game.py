@@ -40,8 +40,6 @@ class RebuiltFirstPersonController(FirstPersonController):
             self.velocity_y = max(0, self.velocity_y)
         self.y += self.velocity_y * time.dt
 
-
-
         # if hasattr(self, 'jumping') and self.jumping:
         ceiling_hit = boxcast(
             self.world_position + Vec3(0, self.height, 0),
@@ -143,7 +141,7 @@ mag_3 = 35
 global_score = 0
 global_health = 100
 
-fireRate3 = 0.1
+fireRate3 = 0.05
 cooldown_timer = 0.0
 
 dummies = []
@@ -412,6 +410,11 @@ def update():
             print(mag_3)
             cooldown_timer = fireRate3
 
+    for dummy in dummies:
+            # targetDummyPos = Vec3(player.x, dummy.y, player.z)
+            # dummy.look_at(targetDummyPos)
+            # dummy.look_at(player)
+            pass
 
     if player.y <= -25:
         print("TERRAIN TERRAIN")
@@ -421,5 +424,5 @@ def update():
 
 app.run()
 
-# Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity.
+# Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity, for whom without I can do nothing.
 # Romans 11:36
