@@ -686,5 +686,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added UI highlighting for active weapon"
+git commit -m "Added a scoring system"
 git push

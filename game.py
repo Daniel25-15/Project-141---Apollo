@@ -66,7 +66,6 @@ menu = Entity(
     scale=(0.6, 0.3),
     z=-0.1,
     enabled=False,
-    
 )
 menu.collider = None
 quit_button = Button(
@@ -85,6 +84,33 @@ return_button = Button(
     parent=menu,
     z=-0.01
 )
+
+UI_ADMIN_MENU = Entity(
+    parent=camera.ui,
+    model="quad",
+    color=color.white,
+    scale=(0.6, 0.3),
+    z=-0.1,
+    enabled=False,
+)
+UI_ADMIN_Exit = Button(
+    text="Exit",
+    color=color.gray,
+    scale=(0.6, 0.2),
+    y=0.25,
+    parent=UI_ADMIN_MENU,
+    z=-0.01
+)
+def ADMIN_MENU_EXIT():
+    global admin_menu_toggle
+    admin_menu_toggle = not admin_menu_toggle
+    mouse.locked = not admin_menu_toggle
+    player.enabled = not admin_menu_toggle
+    UI_ADMIN_MENU.enabled = False
+
+    UI_ADMIN_MENU.enabled = False
+
+UI_ADMIN_Exit.on_click = ADMIN_MENU_EXIT
 
 
 class Wall():
@@ -115,15 +141,16 @@ mag_2 = 15
 mag_3 = 35
 
 global_score = 0
+global_health = 100
 
 fireRate3 = 0.1
 cooldown_timer = 0.0
 
 dummies = []
 
-gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), collider='box')
-gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider='box')
-gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), collider='box')
+gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), collider=None, overlay=True,)
+gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider=None, overlay=True,)
+gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), collider=None, overlay=True,)
 gun_NoModel_2.enabled = False
 gun_NoModel_3.enabled = False
 
@@ -168,6 +195,22 @@ UI_Score_Counter = Text(
     color=color.white
 )
 
+UI_Health_Counter = Text(
+    text=f"Health: {global_health}",
+    scale=1.5,
+    position=(-0.85, -0.4),
+    parent=camera.ui,
+    color=color.white
+)
+
+def handleDeath():
+    global global_score
+    global_score = 0
+    UI_Score_Counter.text = f"Score: {global_score}"
+    player.x = 0
+    player.y= 0
+    player.z= 0
+
 
 def generate_dummies():
     for i in range(9):
@@ -179,6 +222,7 @@ def generate_dummies():
         dummies.append(dummy)
 generate_dummies()
 escape_menu_toggle = False
+admin_menu_toggle = False
 
 def return_to_game():
     global escape_menu_toggle
@@ -250,7 +294,8 @@ class Bullet(Entity):
             self.position += self.forward * distThisFrame
 
 def input(key):
-    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3
+    # print(key)
+    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle
     if key == 'escape':
         escape_menu_toggle = not escape_menu_toggle
         mouse.locked = not escape_menu_toggle
@@ -302,13 +347,21 @@ def input(key):
     if key == 'r':
         if weapon == 1:mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
         if weapon == 2:mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
-        if weapon == 3:mag_3 = 25;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+        if weapon == 3:mag_3 = 35;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
     if key == 'x':
         weapon += 1
     if key == "scroll down":
         weapon += 1
     if key == "scroll up":
         weapon -= 1
+    if key == 'f':
+        handleDeath()
+    if key == "mouse5":
+        admin_menu_toggle = not admin_menu_toggle
+        mouse.locked = not admin_menu_toggle
+        player.enabled = not admin_menu_toggle
+        UI_ADMIN_MENU.enabled = True
+
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
@@ -362,9 +415,7 @@ def update():
 
     if player.y <= -25:
         print("TERRAIN TERRAIN")
-        player.y = 5
-        player.x = 0
-        player.z = 0
+        handleDeath()
     if len(dummies) == 0:
         generate_dummies()
 
