@@ -1,7 +1,7 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 from ursina.shaders import lit_with_shadows_shader
-import random
+import random, time
 
 app = Ursina()
 
@@ -225,6 +225,7 @@ def generate_dummies():
 generate_dummies()
 escape_menu_toggle = False
 admin_menu_toggle = False
+generateNewFollowerToggle = False
 
 
 # generateFollowerEntity(3, 0, 0, 1)
@@ -237,11 +238,12 @@ def generateFollower():
             scale=(scale_var, scale_var, scale_var),
             position=(spawn_x, 0, 0),
             collider="box",
-            shader=lit_with_shadows_shader,
-            color=color.black,
-            texture="white_cube"
+            # shader=lit_with_shadows_shader,
+            # color=color.black,
+            texture="modelTexture"
         )
         followers.append(follower)
+        generateNewFollowerToggle = False
 
 generateFollower()
 
@@ -322,6 +324,16 @@ class Bullet(Entity):
         else:
             self.position += self.forward * distThisFrame
 
+def reload_1():
+    global mag_1
+    mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
+def reload_2():
+    global mag_2
+    mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
+def reload_3():
+    global mag_3
+    mag_3 = 35;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+
 def input(key):
     # print(key)
     global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle
@@ -374,9 +386,9 @@ def input(key):
     if key == 'v':
         dash(15, 0)
     if key == 'r':
-        if weapon == 1:mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
-        if weapon == 2:mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
-        if weapon == 3:mag_3 = 35;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+        if weapon == 1:invoke(reload_1, delay=0.45)
+        if weapon == 2:invoke(reload_2, delay=0.6)
+        if weapon == 3:invoke(reload_3, delay=0.8)
     if key == 'x':
         weapon += 1
     if key == "scroll down":
@@ -398,7 +410,7 @@ print(f"PLAYER XT: {player.x}")
 followerSpeed = 3
 
 def update():
-    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed
+    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle
     if held_keys["shift"]:
         player.speed = 35
     else:
@@ -499,10 +511,11 @@ def update():
         print("TERRAIN TERRAIN")
         handleDeath()
 
-    if len(followers) <= 0:
-        print("NEW FOLLOWERS")
+    if len(followers) <= 0 and not generateNewFollowerToggle:
+        # print("NEW FOLLOWERS")
+        # spawning_wave = True
+        # invoke(generateFollower, delay=2.5)
         generateFollower()
-
 
     if len(dummies) == 0:
         generate_dummies()

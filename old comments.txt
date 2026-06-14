@@ -719,6 +719,8 @@ def generateFollowerEntity(x, y, z, scale_var):
 
 # follower.update = followerUpdate
 
+            moveVector = playerDirection
+
 
 
 git add .
@@ -726,5 +728,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Updated spawning of Followers, and gave them their own function for generating them. Added the ability to shoot at Followers, but disabled it because it is broken. Updated the Follower AI script, and fixed bugs that were added when generating more then 1 follower at a time."
+git commit -m "Added the abilty to remove the Followers when they get hit with a bullet from the bullet class, and generates new followers when the followers list is less then or equal to 0."
 git push
