@@ -285,21 +285,15 @@ def input(key):
     if key == '1':
         print("weapon 1 ")
         weapon = 1
-        gun_NoModel.enabled = True
-        gun_NoModel_2.enabled = False
-        gun_NoModel_3.enabled = False
+        
     if key == '2':
         print("weapon 2 ")
         weapon = 2
-        gun_NoModel.enabled = False
-        gun_NoModel_2.enabled = True
-        gun_NoModel_3.enabled = False
+        
     if key == '3':
         print("weapon 3 ")
         weapon = 3
-        gun_NoModel.enabled = False
-        gun_NoModel_2.enabled = False
-        gun_NoModel_3.enabled = True
+        
     # if key == "control":
     #     print("Crouch")
     #     player.camera_pivot.y -= 1
@@ -329,6 +323,18 @@ def update():
     if cooldown_timer > 0:
         cooldown_timer -= time.dt
     
+    if weapon == 1:
+        gun_NoModel.enabled = True
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = False
+    elif weapon == 2:
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = True
+        gun_NoModel_3.enabled = False
+    elif weapon == 3:
+        gun_NoModel.enabled = False
+        gun_NoModel_2.enabled = False
+        gun_NoModel_3.enabled = True
 
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
         if cooldown_timer <=0:
