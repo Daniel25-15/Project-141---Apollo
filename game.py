@@ -312,10 +312,12 @@ class Bullet(Entity):
                 destroy(hit_info.entity)
                 global_score += 1
                 UI_Score_Counter.text = f"Score: {global_score}"
-            # elif hit_info.entity in followers: 
-            #     followers.remove(hit_info.entity)
-            #     global_score += 1
-            #     UI_Score_Counter.text = f"Score: {global_score}"
+            elif hit_info.entity in followers: 
+                followers.remove(hit_info.entity)
+                destroy(hit_info.entity)
+                global_score += 1
+                UI_Score_Counter.text = f"Score: {global_score}"
+                print(len(followers))
             destroy(self)
         else:
             self.position += self.forward * distThisFrame
@@ -496,6 +498,12 @@ def update():
     if player.y <= -25:
         print("TERRAIN TERRAIN")
         handleDeath()
+
+    if len(followers) <= 0:
+        print("NEW FOLLOWERS")
+        generateFollower()
+
+
     if len(dummies) == 0:
         generate_dummies()
 
