@@ -686,5 +686,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added a new weapon swapping system, that will be changed again soon. Will pave the path for scroll wheel weapon changing"
+git commit -m "Added UI highlighting for active weapon"
 git push

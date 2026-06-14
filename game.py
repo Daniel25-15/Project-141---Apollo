@@ -114,6 +114,8 @@ mag_1 = 10
 mag_2 = 15
 mag_3 = 35
 
+global_score = 0
+
 fireRate3 = 0.1
 cooldown_timer = 0.0
 
@@ -159,7 +161,7 @@ UI_Bullet_Counter_3 = Text(
     color=color.white
 )
 UI_Score_Counter = Text(
-    text=f"Score",
+    text=f"Score: {global_score}",
     scale=1,
     position=(0.0, 0.45),
     parent=camera.ui,
@@ -229,6 +231,7 @@ class Bullet(Entity):
         self.speed = 400
         self.lifetime = 2.5
     def update(self):
+        global global_score
         self.lifetime -= time.dt
         if self.lifetime <= 0:
             destroy(self)
@@ -240,6 +243,8 @@ class Bullet(Entity):
             if hit_info.entity in dummies:
                 dummies.remove(hit_info.entity)
                 destroy(hit_info.entity)
+                global_score += 1
+                UI_Score_Counter.text = f"Score: {global_score}"
             destroy(self)
         else:
             self.position += self.forward * distThisFrame
