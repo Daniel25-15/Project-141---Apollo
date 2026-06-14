@@ -277,26 +277,15 @@ def input(key):
             pass
         
     if key == 'right mouse down' and player.gun_3:
-        # print("RIGHT BUTTON")
         camera.z = 5
     if key == 'right mouse up' and player.gun_3:
-        # print("RIGHT BUTTON")
         camera.z = 0
     if key == '1':
-        print("weapon 1 ")
         weapon = 1
-        
     if key == '2':
-        print("weapon 2 ")
-        weapon = 2
-        
+        weapon = 2  
     if key == '3':
-        print("weapon 3 ")
         weapon = 3
-        
-    # if key == "control":
-    #     print("Crouch")
-    #     player.camera_pivot.y -= 1
     if key == 'control' or key == 'left control':
         camera.y = -0.5
     if key == 'control up' or key == 'left control up':
@@ -309,12 +298,14 @@ def input(key):
         if weapon == 1:mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
         if weapon == 2:mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
         if weapon == 3:mag_3 = 25;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+    if key == 'x':
+        weapon += 1
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
 
 def update():
-    global mag_3, cooldown_timer, fireRate3
+    global mag_3, cooldown_timer, fireRate3, weapon
     if held_keys["shift"]:
         player.speed = 35
     else:
@@ -335,6 +326,9 @@ def update():
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = False
         gun_NoModel_3.enabled = True
+
+    if weapon > 3:
+        weapon = 1
 
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
         if cooldown_timer <=0:
