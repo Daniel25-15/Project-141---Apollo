@@ -322,14 +322,23 @@ def update():
         gun_NoModel.enabled = True
         gun_NoModel_2.enabled = False
         gun_NoModel_3.enabled = False
+        UI_Bullet_Counter_3.color = color.white
+        UI_Bullet_Counter_2.color = color.white
+        UI_Bullet_Counter_1.color = color.green
     elif weapon == 2:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = True
         gun_NoModel_3.enabled = False
+        UI_Bullet_Counter_2.color = color.green
+        UI_Bullet_Counter_1.color = color.white
+        UI_Bullet_Counter_3.color = color.white
     elif weapon == 3:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = False
         gun_NoModel_3.enabled = True
+        UI_Bullet_Counter_3.color = color.green
+        UI_Bullet_Counter_2.color = color.white
+        UI_Bullet_Counter_1.color = color.white
 
     if weapon > 3:
         weapon = 1
