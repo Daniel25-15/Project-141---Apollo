@@ -686,5 +686,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added an Administrator menu for future use. Added UI element for a Health system. Added a 'HandleDeath' function (For this update, don't press F c: ) , *Will be completed similarly to when the health system gets finished.*  "
+git commit -m "Fixed bugs with the health system, and the HandleDeath function. Added a 'Follower' entity with custom model. Added Follower AI. Follower AI will NEED to be update soon."
 git push

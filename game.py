@@ -1,5 +1,6 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
+from ursina.shaders import lit_with_shadows_shader
 import random
 
 app = Ursina()
@@ -202,12 +203,14 @@ UI_Health_Counter = Text(
 )
 
 def handleDeath():
-    global global_score
+    global global_score, global_health
     global_score = 0
     UI_Score_Counter.text = f"Score: {global_score}"
     player.x = 0
     player.y= 0
     player.z= 0
+    global_health = 100
+    UI_Health_Counter.text = f"Health: {global_health}"
 
 
 def generate_dummies():
@@ -221,6 +224,53 @@ def generate_dummies():
 generate_dummies()
 escape_menu_toggle = False
 admin_menu_toggle = False
+
+def generateFollowerEntity(x, y, z, scale_var):
+    follower = Entity(
+        model="FollowerModelFixed.glb",
+        scale=(scale_var, scale_var, scale_var),
+        position=(x, y, z),
+        collider="box",
+        # shader=lit_with_shadows_shader,
+        texture=None,
+        rotation=(0, 90, 0)
+    )
+
+# generateFollowerEntity(3, 0, 0, 1)
+scale_var = 1
+follower = Entity(
+    model="FollowerModel3.glb",
+    scale=(scale_var, scale_var, scale_var),
+    position=(3, 0, 0),
+    collider="box",
+    shader=lit_with_shadows_shader,
+    texture="white_cube"
+)
+
+def followerUpdate():
+    global global_health
+    playerDirection = player.position - follower.position
+    if playerDirection.length() > 1.5:
+        playerDirection = playerDirection.normalized()
+        follower.position += playerDirection * time.dt * 3
+        follower.look_at(player)
+        follower.rotation_x = 0
+        follower.rotation_z = 0
+        follower.rotation_y += 90
+
+        # followerHitInfo = follower.intersects(traverse_target=player)
+        # if followerHitInfo.hit:
+        #     
+        if distance(follower, player) < 1.5:
+            global_health -= 10
+            print(f"DAMAGED HEALTH: {global_health}")
+            UI_Health_Counter.text = f"Health: {global_health}"
+
+        # followerHitInfo = follower.intersects()
+        # if followerHitInfo.hit and followerHitInfo.entity == player:
+        #     print("The follower hit the player!")
+
+follower.update = followerUpdate
 
 def return_to_game():
     global escape_menu_toggle
@@ -400,6 +450,9 @@ def update():
         weapon = 1
     if weapon < 1:
         weapon = 3
+
+    if global_health == 0:
+        handleDeath()
 
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
         if cooldown_timer <=0:
