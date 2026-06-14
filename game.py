@@ -137,6 +137,36 @@ player.gun_3 = gun_NoModel_3
 
 # x, y, z = 5, 5, 6
 
+UI_Bullet_Counter_1 = Text(
+    text=f"Ammo Gun 1: {mag_1}",
+    scale=1,
+    position=(-0.85, 0.45),
+    parent=camera.ui,
+    color=color.white
+)
+UI_Bullet_Counter_2 = Text(
+    text=f"Ammo Gun 2: {mag_2}",
+    scale=1,
+    position=(-0.85, 0.40),
+    parent=camera.ui,
+    color=color.white
+)
+UI_Bullet_Counter_3 = Text(
+    text=f"Ammo Gun 3: {mag_3}",
+    scale=1,
+    position=(-0.85, 0.35),
+    parent=camera.ui,
+    color=color.white
+)
+UI_Score_Counter = Text(
+    text=f"Score",
+    scale=1,
+    position=(0.0, 0.45),
+    parent=camera.ui,
+    color=color.white
+)
+
+
 def generate_dummies():
     for i in range(9):
         x = random.choice([3, 4, 5, 6, 9])
@@ -182,7 +212,7 @@ def dash(MoveDistance, raise_y):
             player.y += 3
 
     targetPosition = player.position + (player.forward * finalMoveDistance)
-    player.animate_position(targetPosition, duration=0.1, curve=curve.linear)
+    player.animate_position(targetPosition, duration=0.3, curve=curve.linear)
 
 weapon = 1
 
@@ -235,11 +265,13 @@ def input(key):
             gun_NoModel.blink(color.white)
 
             mag_1 -= 1
+            UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
             print(mag_1)
         elif weapon == 2 and mag_2 > 0:
             Bullet(color.green, position=camera.world_position + gun_NoModel_2.forward, rotation=camera.world_rotation)
             gun_NoModel_2.blink(color.white)
             mag_2 -= 1
+            UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
             print(mag_2)
         elif weapon == 3:
             pass
@@ -280,12 +312,9 @@ def input(key):
     if key == 'v':
         dash(15, 0)
     if key == 'r':
-        if weapon == 1:
-            mag_1 = 10
-        if weapon == 2:
-            mag_2 = 15
-        if weapon == 3:
-            mag_3 = 25
+        if weapon == 1:mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
+        if weapon == 2:mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
+        if weapon == 3:mag_3 = 25;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
@@ -306,6 +335,7 @@ def update():
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
             gun_NoModel_3.blink(color.white)
             mag_3 -= 1
+            UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
             print(mag_3)
             cooldown_timer = fireRate3
 
@@ -319,3 +349,6 @@ def update():
         generate_dummies()
 
 app.run()
+
+# Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity.
+# Romans 11:36
