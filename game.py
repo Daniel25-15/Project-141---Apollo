@@ -112,7 +112,7 @@ bullets_3 = []
 
 mag_1 = 10
 mag_2 = 15
-mag_3 = 25
+mag_3 = 35
 
 fireRate3 = 0.1
 cooldown_timer = 0.0
@@ -300,6 +300,10 @@ def input(key):
         if weapon == 3:mag_3 = 25;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
     if key == 'x':
         weapon += 1
+    if key == "scroll down":
+        weapon += 1
+    if key == "scroll up":
+        weapon -= 1
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
@@ -329,6 +333,8 @@ def update():
 
     if weapon > 3:
         weapon = 1
+    if weapon < 1:
+        weapon = 3
 
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
         if cooldown_timer <=0:
