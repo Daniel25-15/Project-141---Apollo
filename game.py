@@ -454,10 +454,21 @@ def update():
         playerDirection = player.position - f.position
         if playerDirection.length() > 1.5:
             playerDirection = playerDirection.normalized()
-            
-            # f.position += playerDirection * time.dt * followerSpeed
 
-            move_x = playerDirection.x * time.dt * 3
+            moveVector = playerDirection
+
+            for otherF in followers:
+                if otherF == f:
+                    continue
+                
+                distToSame = distance(f, otherF)
+                if distToSame < 1.2:
+                    pushBack = f.position - otherF.position
+                    if pushBack.length() > 0:
+                        moveVector += pushBack.normalized() * 1.5
+            moveVector = moveVector.normalized()
+
+            move_x = playerDirection.x * time.dt * followerSpeed
             move_z = playerDirection.z * time.dt * followerSpeed
 
             wallHitCheck = raycast(
