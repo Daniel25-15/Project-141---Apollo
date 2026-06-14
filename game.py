@@ -238,6 +238,7 @@ def generateFollower():
             position=(spawn_x, 0, 0),
             collider="box",
             shader=lit_with_shadows_shader,
+            color=color.black,
             texture="white_cube"
         )
         followers.append(follower)
@@ -392,8 +393,10 @@ print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
 
+followerSpeed = 3
+
 def update():
-    global mag_3, cooldown_timer, fireRate3, weapon, global_health
+    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed
     if held_keys["shift"]:
         player.speed = 35
     else:
@@ -429,7 +432,7 @@ def update():
     if weapon < 1:
         weapon = 3
 
-    if global_health == 0:
+    if global_health <= 0:
         handleDeath()
 
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
@@ -451,7 +454,22 @@ def update():
         playerDirection = player.position - f.position
         if playerDirection.length() > 1.5:
             playerDirection = playerDirection.normalized()
-            f.position += playerDirection * time.dt * 3
+            
+            # f.position += playerDirection * time.dt * followerSpeed
+
+            move_x = playerDirection.x * time.dt * 3
+            move_z = playerDirection.z * time.dt * followerSpeed
+
+            wallHitCheck = raycast(
+                origin=f.position + Vec3(0, 1, 0),
+                direction=Vec3(playerDirection.x, 0, playerDirection.z),
+                distance=1.2,
+                ignore=(f, player)
+            )
+            if not wallHitCheck.hit:
+                f.x += move_x
+                f.z += move_z
+
             f.look_at(player)
             f.rotation_x = 0
             f.rotation_z = 0
