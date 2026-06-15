@@ -56,7 +56,7 @@ class RebuiltFirstPersonController(FirstPersonController):
 
 lootBox = Entity(
     model="cube",
-    texture="white_cube",
+    texture="brick",
     scale=1,
     color=color.gold,
     collider="box",
@@ -128,14 +128,7 @@ class Wall():
             texture_scale=texture_scale_def,
             collider=collider_type,
             position=position_all,
-            # rotation_x=rotation_def
-            # rotation=rotation_def,
-            thickness=2,
         )
-
-# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (2.5, 4.5, 5.5), (90, 0, 0))
-# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (7.5, 4.5, 9.5), (0, 90, 0))
-# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (11.5, 4.5, 5.5), (90, 0, 0))
 
 # (x, y, z)
 
@@ -147,12 +140,7 @@ def buildWalls():
     wall5 = Wall("Wall5", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 1.5, 13))
     wall6 = Wall("Wall6", 'cube', 'white_cube', (2, 3, 2), color.gray,  (1, 1), 'box', (11, 1.5, 13))
     wall7 = Wall("Wall7", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (8, 2, 12))
-    # wall2 = Wall("Wall2", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (7, 2, 13), (0, 0, 90))
-    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
-    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
-    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
 
-# scene.collider.visible = True
 buildWalls()
 
 bullets_1 = []
@@ -182,14 +170,23 @@ gun_NoModel.collider = None
 gun_NoModel_2.collider = None
 gun_NoModel_3.collider = None
 
+gun_NoModel.intersects = False
+enable_gun_3 = False
 
 player = FirstPersonController(
     speed = 15,
-    model=None,
-    y=0
+    # model='sphere',
+    model = None,
+    y=0,
+    # scale=(0.5, 1, 0.5),
+    # collider = "box"
+    # position=(10, 0, 10)
 )
 
 player.collider = 'sphere'
+# player.scale = (0.5, 0.5, 0.5)
+# player.height = 8
+# camera.y = 2
 
 # player.collider = BoxCollider(player, center=(0,1,0), size=(1.5, 2, 1.5))
 # player.slope_smoothing = 2 
@@ -382,7 +379,7 @@ def disableWeapon():
 
 def input(key):
     # print(key)
-    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle
+    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3
     if key == 'escape':
         escape_menu_toggle = not escape_menu_toggle
         mouse.locked = not escape_menu_toggle
@@ -462,6 +459,13 @@ def input(key):
         mouse.locked = not admin_menu_toggle
         player.enabled = not admin_menu_toggle
         UI_ADMIN_MENU.enabled = True
+    if key == 'e':
+        lootBoxRaycast = raycast(camera.world_position, camera.forward, distance=10, ignore=(player,))
+        if lootBoxRaycast.hit:
+            if lootBoxRaycast.entity == lootBox:
+                lootBox.enabled = False
+                enable_gun_3 = True
+
 
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
@@ -470,7 +474,7 @@ print(f"PLAYER XT: {player.x}")
 followerSpeed = 3
 
 def update():
-    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle
+    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle, enable_gun_3
     if held_keys["shift"]:
         player.speed = 20
     else:
@@ -540,7 +544,7 @@ def update():
         UI_Bullet_Counter_2.color = color.green
         UI_Bullet_Counter_1.color = color.white
         UI_Bullet_Counter_3.color = color.white
-    elif weapon == 3:
+    elif weapon == 3 and enable_gun_3:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = False
         gun_NoModel_3.enabled = True
@@ -556,7 +560,7 @@ def update():
     if global_health <= 0:
         handleDeath()
 
-    if held_keys["left mouse"] and weapon == 3  and mag_3 > 0:
+    if held_keys["left mouse"] and weapon == 3  and mag_3 > 0 and enable_gun_3:
         if cooldown_timer <=0:
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
             gun_NoModel_3.blink(color.white)
@@ -564,7 +568,8 @@ def update():
             UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
             print(mag_3)
             cooldown_timer = fireRate3
-
+    if not enable_gun_3 and weapon == 3:
+        weapon = 2
     for dummy in dummies:
             # targetDummyPos = Vec3(player.x, dummy.y, player.z)
             # dummy.look_at(targetDummyPos)
@@ -629,6 +634,7 @@ def update():
         # generate_dummies()
         pass
 
+scene.colliders_visible = True
 app.run()
 
 # Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity, for whom without I can do nothing.

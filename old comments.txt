@@ -738,5 +738,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Updated the ADS (Aim Down Sights) functions, by changing the positions for each gun model"
+git commit -m "Added a requirement to unlock the weapon 3. Tried to fix the same bug as last time, with the player being able to easily get stuck in the walls. Removed a 'Thickness = 2' attribute in the Wall class. "
 git push
