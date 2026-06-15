@@ -1,0 +1,3 @@
+Number of times given up > What made me give up > Fix for the Bug > Who was able to impliment the fix.
+
+1. > June 15 2026 > Movement checks were not working, and player was able to get stuck in walls by going at a certain angle. > Implemented a fix that pushed the player back, after checking attributes, and then applying the motion. > I, the creator of this project, could NOT fix this alone.

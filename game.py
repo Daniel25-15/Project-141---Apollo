@@ -8,7 +8,7 @@ app = Ursina()
 ground = Entity(
     model='plane',
     texture='white_cube',
-    scale=(100, 1, 100),
+    scale=(300, 1, 300),
     color=color.green,
     texture_scale=(100, 100),
     collider='box'
@@ -52,10 +52,16 @@ class RebuiltFirstPersonController(FirstPersonController):
         if ceiling_hit.hit and self.velocity_y > 0:
             self.velocity_y = 0
             self.y = ceiling_hit.point.y - self.height
-# player = RebuiltFirstPersonController(
-#     speed = 25
-# )
 
+
+lootBox = Entity(
+    model="cube",
+    texture="white_cube",
+    scale=1,
+    color=color.gold,
+    collider="box",
+    position=(8, 4.5, 12)
+)
 
 
 menu = Entity(
@@ -113,7 +119,7 @@ UI_ADMIN_Exit.on_click = ADMIN_MENU_EXIT
 
 
 class Wall():
-    def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all,rotation_def):
+    def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all):
         self.entity = Entity(
             model=model_type,
             texture=texture_type,
@@ -123,13 +129,31 @@ class Wall():
             collider=collider_type,
             position=position_all,
             # rotation_x=rotation_def
-            rotation=rotation_def
+            # rotation=rotation_def,
+            thickness=2,
         )
 
-Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (2.5, 4.5, 5.5), (90, 0, 0))
-Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (7.5, 4.5, 9.5), (0, 90, 0))
-Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (11.5, 4.5, 5.5), (90, 0, 0))
+# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (2.5, 4.5, 5.5), (90, 0, 0))
+# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (7.5, 4.5, 9.5), (0, 90, 0))
+# Wall1 = Wall("wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (11.5, 4.5, 5.5), (90, 0, 0))
 
+# (x, y, z)
+
+def buildWalls():
+    wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (5.5, 4.5, 10.5))
+    wall2 = Wall("Wall2", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (9.5, 4.5, 14.5))
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (14.5, 4.5, 10.5))
+    wall4 = Wall("Wall4", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 0.5, 11))
+    wall5 = Wall("Wall5", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 1.5, 13))
+    wall6 = Wall("Wall6", 'cube', 'white_cube', (2, 3, 2), color.gray,  (1, 1), 'box', (11, 1.5, 13))
+    wall7 = Wall("Wall7", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (8, 2, 12))
+    # wall2 = Wall("Wall2", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (7, 2, 13), (0, 0, 90))
+    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
+    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
+    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (9, 9), 'box', (5.5, 4.5, 10.5), (90, 0, 0))
+
+# scene.collider.visible = True
+buildWalls()
 
 bullets_1 = []
 bullets_2 = []
@@ -148,21 +172,33 @@ cooldown_timer = 0.0
 dummies = []
 followers = []
 
-gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), collider=None, overlay=True,)
-gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), collider=None, overlay=True,)
-gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), collider=None, overlay=True,)
+gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), overlay=True, add_to_scene_entities=False, render_queue=1)
+gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), overlay=True,)
+gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), overlay=True,)
 gun_NoModel_2.enabled = False
 gun_NoModel_3.enabled = False
 
+gun_NoModel.collider = None
+gun_NoModel_2.collider = None
+gun_NoModel_3.collider = None
+
+
 player = FirstPersonController(
-    speed = 25,
-    model='cube',
+    speed = 15,
+    model=None,
     y=0
 )
+
+player.collider = 'sphere'
+
+# player.collider = BoxCollider(player, center=(0,1,0), size=(1.5, 2, 1.5))
+# player.slope_smoothing = 2 
 
 player.gun_1 = gun_NoModel
 player.gun_2 = gun_NoModel_2
 player.gun_3 = gun_NoModel_3
+
+player.ignore_list.append(gun_NoModel)
 
 # x, y, z = 5, 5, 6
 
@@ -222,7 +258,7 @@ def generate_dummies():
 
         dummy = Entity(model='cube', color=color.white,texture='target.png',scale=(1,1,0.1),dx=0.05, position=(x,y,z), collider='box')
         dummies.append(dummy)
-generate_dummies()
+# generate_dummies()
 escape_menu_toggle = False
 admin_menu_toggle = False
 generateNewFollowerToggle = False
@@ -231,8 +267,8 @@ generateNewFollowerToggle = False
 # generateFollowerEntity(3, 0, 0, 1)
 scale_var = 1
 def generateFollower():
-    for i in range(3):
-        spawn_x = 5 + (i * 5)
+    for i in range(random.randint(5, 15)):
+        spawn_x = 5 + (i * 3)
         follower = Entity(
             model="character",
             scale=1, #(scale_var, scale_var, scale_var)
@@ -242,10 +278,11 @@ def generateFollower():
             # color=color.black,
             # texture="newmodel.png"
         )
+        follower.speed = random.randint(2, 5)
         followers.append(follower)
         generateNewFollowerToggle = False
 
-generateFollower()
+# generateFollower()
 
 
 
@@ -334,6 +371,15 @@ def reload_3():
     global mag_3
     mag_3 = 35;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
 
+weaponToggle = False
+def disableWeapon():
+    global weaponToggle,weapon 
+    print(f"DISABLED WEAPON: {weapon}")
+    weaponToggle = not weaponToggle
+    if weaponToggle == False:
+        if weapon == 1:
+            gun_NoModel.enabled = False
+
 def input(key):
     # print(key)
     global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle
@@ -410,7 +456,7 @@ def input(key):
     if key == "scroll up":
         weapon -= 1
     if key == 'f':
-        handleDeath()
+        disableWeapon()
     if key == "mouse5":
         admin_menu_toggle = not admin_menu_toggle
         mouse.locked = not admin_menu_toggle
@@ -426,13 +472,60 @@ followerSpeed = 3
 def update():
     global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle
     if held_keys["shift"]:
-        player.speed = 35
+        player.speed = 20
     else:
-        player.speed = 25
+        player.speed = 15
 
     if cooldown_timer > 0:
         cooldown_timer -= time.dt
-    
+        
+    move_input = Vec3(held_keys['d'] - held_keys['a'], 0, held_keys['w'] - held_keys['s'])
+    origin = player.position + Vec3(0, 1, 0)
+    if move_input.length() > 0:
+        flat_forward = Vec3(camera.forward.x, 0, camera.forward.z)
+        if flat_forward.length() == 0:
+            flat_forward = Vec3(0, 0, 1)
+        flat_forward = flat_forward.normalized()
+        flat_right = Vec3(camera.right.x, 0, camera.right.z).normalized()
+
+        desired_dir = (flat_forward * move_input.z + flat_right * move_input.x)
+        if desired_dir.length() > 0:
+            desired_dir = desired_dir.normalized()
+            move_distance = max(0.05, player.speed * time.dt)
+            hit = raycast(origin, desired_dir, distance=move_distance + 0.2, ignore=(player,))
+
+            if hit.hit:
+                neededclearance = 0.48
+                if hasattr(hit, 'distance') and hit.distance < neededclearance:
+                    player.position += hit.world_normal * (neededclearance - hit.distance + 0.01)
+                slide = desired_dir - hit.world_normal * desired_dir.dot(hit.world_normal)
+                if slide.length() > 0.001:
+                    player.direction = slide.normalized()
+                else:
+                    player.direction = Vec3(0, 0, 0)
+            else:
+                player.direction = desired_dir
+    else:
+        pass
+    flat_forward = Vec3(camera.forward.x, 0, camera.forward.z)
+    if flat_forward.length() == 0:
+        flat_forward = Vec3(0, 0, 1)
+    flat_forward = flat_forward.normalized()
+    flat_right = Vec3(camera.right.x, 0, camera.right.z)
+    if flat_right.length() == 0:
+        flat_right = Vec3(1, 0, 0)
+    flat_right = flat_right.normalized()
+
+    clearance = 0.48
+    dir_candidates = []
+    if 'desired_dir' in locals() and isinstance(desired_dir, Vec3) and desired_dir.length() > 0:
+        dir_candidates.append(desired_dir)
+    dir_candidates.extend([flat_forward, -flat_forward, flat_right, -flat_right])
+    for check_dir in dir_candidates:
+        hit2 = raycast(origin, check_dir, distance=clearance, ignore=(player,))
+        if hit2.hit and hasattr(hit2, 'distance') and hit2.distance < clearance:
+            player.position += hit2.world_normal * (clearance - hit2.distance + 0.01)
+
     if weapon == 1:
         gun_NoModel.enabled = True
         gun_NoModel_2.enabled = False
@@ -529,10 +622,12 @@ def update():
         # print("NEW FOLLOWERS")
         # spawning_wave = True
         # invoke(generateFollower, delay=2.5)
-        generateFollower()
+        # generateFollower()
+        pass
 
     if len(dummies) == 0:
-        generate_dummies()
+        # generate_dummies()
+        pass
 
 app.run()
 

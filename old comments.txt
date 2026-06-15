@@ -725,6 +725,13 @@ def generateFollowerEntity(x, y, z, scale_var):
 position= (0.5, -1.5, 2.5)
 rotation=(0, -90, 0)
 
+    forwardCheck = raycast(player.position + Vec3(0, 1, 0), player.forward, distance=1.2, ignore=(player,))
+    if forwardCheck.hit:
+        if forwardCheck.entity.color == color.gray:
+            player.position -= player.forward * time.dt * player.speed
+
+
+ursfx([(0.0, 0.44), (0.14, 0.12), (0.34, 0.1), (0.64, 0.41), (0.96, 0.94)], volume=0.53, wave='sine', pitch=8, speed=2.7)
 
 git add .
 git commit -m "Changes"
