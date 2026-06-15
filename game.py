@@ -7,51 +7,21 @@ app = Ursina()
 
 ground = Entity(
     model='plane',
-    texture='white_cube',
+    texture='grass',
     scale=(300, 1, 300),
     color=color.green,
     texture_scale=(100, 100),
     collider='box'
 )
 
-# player = FirstPersonController(
-#     speed=25,
-#     ceiling_raycast=True
-# )
+sky = Sky()
+sky.texture = "radial_gradient"
+sky.color = color.red
+# sky.color = color.hsv(26.3, 0.895, 0.710)
+# sky.color = color.rgb(181, 90, 19)
 
-class RebuiltFirstPersonController(FirstPersonController):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.gravity = 0 
-        self.velocity_y = 0
-        self.jump_force = 12
-        self.gravity_strength = 35
-    def input(self, key):
-        if key == "space" and self.grounded:
-            self.velocity_y = self.jump_force
-            self.grounded = False
-            return
-        super().input(key)
-    def update(self):
-        super().update()
+# AmbientLight(color=color.rgba(0.3, 0.3, 0.3, 1))
 
-        if not self.grounded:
-            self.velocity_y -= self.gravity_strength * time.dt
-        else:
-            self.velocity_y = max(0, self.velocity_y)
-        self.y += self.velocity_y * time.dt
-
-        # if hasattr(self, 'jumping') and self.jumping:
-        ceiling_hit = boxcast(
-            self.world_position + Vec3(0, self.height, 0),
-            direction=Vec3(0, 1, 0),
-            distance=0.3,
-            thickness=(0.8, 0.8),
-            ignore=(self,)
-        )
-        if ceiling_hit.hit and self.velocity_y > 0:
-            self.velocity_y = 0
-            self.y = ceiling_hit.point.y - self.height
 
 
 lootBox = Entity(
