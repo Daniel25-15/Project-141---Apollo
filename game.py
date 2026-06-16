@@ -5,6 +5,33 @@ import random, time
 
 app = Ursina()
 
+logo = """
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XX■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■XX 
+   X■                                                       ■X   
+    X■■                                                   ■■X    
+     XX■                        ▄▓                       ■XX     
+       X■■                      █▓                     ■■X       
+        XX■                     █▓                    ■XX        
+          X■                 ███████▓                ■X          
+           X■■                  █▓                 ■■X           
+            XX■                 █▓                ■XX            
+              X■                █▓              ■■X              
+               X■■              █▓             ■XX               
+                XX■             █▓            ■X                 
+                  X■■           █▓          ■■X                  
+                   XX■          ▀          ■XX                   
+                     X■    +---------+    ■X                     
+                      X■■  |The Truth|  ■■X                      
+                       XX■ +---------+ ■XX                       
+                         X■■         ■■X                         
+                          XX■       ■XX                          
+                            X■     ■X                            
+                             X■■ ■■X                             
+                              XX■XX                              
+                                X                                
+"""
+
 ground = Entity(
     model='plane',
     texture='grass',
@@ -57,6 +84,40 @@ return_button = Button(
     scale=(0.6, 0.2),
     y=0.25,
     parent=menu,
+    z=-0.01
+)
+credits_button = Button(
+    text="Credits",
+    color=color.green,
+    scale=(0.6, 0.2),
+    y=-0.25,
+    parent=menu,
+    z=-0.01
+)
+
+CreditsMenu = Entity(
+    parent=camera.ui,
+    model="quad",
+    color=color.white,
+    world_scale = 15,
+    z=-0.1,
+    enabled=False,
+)
+CreditsLabel = Text(
+    parent=CreditsMenu,
+    y=0.0,
+    scale=1.25,
+    origin=(0, 0),
+    color = color.black,
+    text="Creator of the project: Daniel Glenn\nLead, and only, programmer: Daniel Glenn\nLead, and only, 3d modeler, Artist, and Animator: Jude Roberts",
+    z=-0.2
+)
+CreditsMenuLeave = Button(
+    text="Exit",
+    color=color.green,
+    scale=(0.5, 0.1),
+    y=-0.375,
+    parent=CreditsMenu,
     z=-0.01
 )
 
@@ -220,6 +281,14 @@ def handleDeath():
     global_health = 100
     UI_Health_Counter.text = f"Health: {global_health}"
 
+def showCredits():
+    menu.enabled = False
+    CreditsMenu.enabled = True
+
+def ExitCredits():
+    CreditsMenu.enabled = False
+    mouse.locked = True
+    player.enabled = True
 
 def generate_dummies():
     for i in range(9):
@@ -266,6 +335,9 @@ def return_to_game():
 
 quit_button.on_click = application.quit
 return_button.on_click = return_to_game
+
+credits_button.on_click = showCredits
+CreditsMenuLeave.on_click = ExitCredits
 # quit_button.enabled = escape_menu_toggle
 
 def final_menu():
@@ -333,6 +405,17 @@ class Bullet(Entity):
         else:
             self.position += self.forward * distThisFrame
 
+def cameraShake(duration=0.2, intensity=0.1):
+    originalPosition = camera.position
+    def executeShake(durationRemaining):
+        if durationRemaining > 0:
+            camera.x = originalPosition.x + random.uniform(-intensity, intensity)
+            camera.y = originalPosition.y + random.uniform(-intensity, intensity)
+            invoke(executeShake, durationRemaining - 0.02, delay=0.02)
+        else:
+            camera.position = originalPosition
+    executeShake(duration)
+
 def reload_1():
     global mag_1, ammo_amount_1
     if ammo_amount_1 >= 10:
@@ -345,6 +428,7 @@ def reload_2():
     global mag_2, ammo_amount_2
     if ammo_amount_2 >= 15:
         mag_2 = 15
+        ammo_amount_2 -= 15
     else:
         mag_2 = ammo_amount_2
     UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
@@ -352,6 +436,7 @@ def reload_3():
     global mag_3, ammo_amount_3
     if ammo_amount_3 >= 35:
         mag_3 = 35
+        ammo_amount_3 -= 35
     else:
         mag_3 = ammo_amount_3
     UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
@@ -372,6 +457,8 @@ def input(key):
         escape_menu_toggle = not escape_menu_toggle
         mouse.locked = not escape_menu_toggle
         player.enabled = not escape_menu_toggle
+        if CreditsMenu.enabled:
+            CreditsMenu.enabled = False
         # quit_button.enabled = not escape_menu_toggle
         menu.enabled = escape_menu_toggle
 
@@ -457,6 +544,8 @@ def input(key):
             if lootBoxRaycast.entity == lootBox:
                 lootBox.enabled = False
                 enable_gun_3 = True
+
+
 
 
 print(f"CAMERA INT {camera.y}")
@@ -638,6 +727,14 @@ def update():
                 global_health -= 10
                 print(f"DAMAGED HEALTH: {global_health}")
                 UI_Health_Counter.text = f"Health: {global_health}"
+                cameraShake(0.05, 0.2)
+                knockbackCheck = raycast(player.position + Vec3(0, 1, 0), player.back, distance=3.25, ignore=(player,))
+                if knockbackCheck.hit:
+                    finalKnockbackDistance = knockbackCheck.distance - 0.5
+                else:
+                    finalKnockbackDistance = 3
+                    knockbackLandPosition = player.position + (player.back * finalKnockbackDistance)
+                    player.animate_position(knockbackLandPosition, duration=0.275, curver=curve.linear)
                 # player.position += playerDirection * -2
         if f.y <= -25:
             print("FELL OFF")
@@ -657,32 +754,7 @@ def update():
         # generate_dummies()
         pass
 
-logo = """
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
- XX■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■XX 
-   X■                                                       ■X   
-    X■■                                                   ■■X    
-     XX■                        ▄▓                       ■XX     
-       X■■                      █▓                     ■■X       
-        XX■                     █▓                    ■XX        
-          X■                 ███████▓                ■X          
-           X■■                  █▓                 ■■X           
-            XX■                 █▓                ■XX            
-              X■                █▓              ■■X              
-               X■■              █▓             ■XX               
-                XX■             █▓            ■X                 
-                  X■■           █▓          ■■X                  
-                   XX■          ▀          ■XX                   
-                     X■    +---------+    ■X                     
-                      X■■  |The Truth|  ■■X                      
-                       XX■ +---------+ ■XX                       
-                         X■■         ■■X                         
-                          XX■       ■XX                          
-                            X■     ■X                            
-                             X■■ ■■X                             
-                              XX■XX                              
-                                X                                
-"""
+
 print(logo)
 
 scene.colliders_visible = True
