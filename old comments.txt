@@ -859,5 +859,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added comments for other people who are reading the code"
+git commit -m "Added UI elements for the weapons, (all of the weapons have the same icon, becuase there is only 1 icon right now.) Rewrote the reloading system, and changed the aproach taken to execute the reload sequence"
 git push

@@ -231,6 +231,8 @@ gun_NoModel_3.collider = None
 gun_NoModel.intersects = False
 enable_gun_3 = False
 
+globalUIelementsColor = color.black
+
 # defining the player, and giving it the pre built basic movement capabilites
 player = FirstPersonController(
     speed = 15,
@@ -260,41 +262,43 @@ player.ignore_list.append(gun_NoModel)
 # x, y, z = 5, 5, 6
 #defines the UI elements for each of the ammo counters that update when a bullet is shot
 UI_Bullet_Counter_1 = Text(
-    text=f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}",
-    scale=1,
-    position=(-0.8, 0.45),
+    text=f"Ammo: {mag_1}\nReserve: {ammo_amount_1}",
+    scale=1.25,
+    position=(0.37, -0.388),
     parent=camera.ui,
-    color=color.white
+    color=globalUIelementsColor
 )
 UI_weapon_1_2d = Sprite(
-    scale=0.01,
-    position=(-0.85, 0.44),
+    scale=0.025,
+    position=(0.3, -0.415),
     parent=camera.ui,
     texture="pistolPNG"
 )
 UI_Bullet_Counter_2 = Text(
-    text=f"Ammo Gun 2: {mag_2}. Ammo Reserver {ammo_amount_2}",
-    scale=1,
-    position=(-0.8, 0.40),
+    text=f"Ammo: {mag_2}\nReserve: {ammo_amount_2}",
+    scale=1.25,
+    # position=(-0.8, 0.40),
+    position=(0.37, -0.388),
     parent=camera.ui,
-    color=color.white
+    color=globalUIelementsColor
 )
 UI_weapon_2_2d = Sprite(
-    scale=0.01,
-    position=(-0.85, 0.39),
+    scale=0.025,
+    position=(0.3, -0.415),
     parent=camera.ui,
     texture="pistolPNG"
 )
 UI_Bullet_Counter_3 = Text(
-    text=f"Ammo Gun 3: {mag_3}. Ammo Reserver {ammo_amount_3}",
-    scale=1,
-    position=(-0.8, 0.35),
+    text=f"Ammo: {mag_3}\nReserve: {ammo_amount_3}",
+    scale=1.25,
+    # position=(-0.8, 0.35),
+    position=(0.37, -0.388),
     parent=camera.ui,
-    color=color.white
+    color=globalUIelementsColor
 )
 UI_weapon_2_2d = Sprite(
-    scale=0.01,
-    position=(-0.85, 0.34),
+    scale=0.025,
+    position=(0.3, -0.415),
     parent=camera.ui,
     texture="pistolPNG"
 )
@@ -304,16 +308,28 @@ UI_Score_Counter = Text(
     scale=1,
     position=(0.0, 0.45),
     parent=camera.ui,
-    color=color.white
+    color=globalUIelementsColor
+)
+UI_score_2d = Sprite(
+    scale=0.01,
+    position=(-0.05, 0.44),
+    parent=camera.ui,
+    texture="scorePNG"
 )
 
 # defines the UI elements for the health of the player that gets updated later
 UI_Health_Counter = Text(
     text=f"Health: {global_health}",
     scale=1.5,
-    position=(-0.85, -0.4),
+    position=(-0.8, -0.4),
     parent=camera.ui,
-    color=color.white
+    color=globalUIelementsColor
+)
+UI_health_2d = Sprite(
+    scale=0.01,
+    position=(-0.825, -0.415),
+    parent=camera.ui,
+    texture="healthPNG"
 )
 
 # handles the death function by reseting health, reseting score, and reseting player position
@@ -475,24 +491,25 @@ def cameraShake(duration=0.2, intensity=0.1):
     executeShake(duration)
 
 # handles the reloads for each weapon. each weapon takes the ammount of ammo its supposed to have, and subtracts that amount of ammo from the ammo reserve, and then resets the ammo it can. if you dont have enough for a full mag, then you get whatever you have left
+# takes the minimum between the max size minus the ammount currently in the mag, and the size in the reserve 
 def reload_1():
     global mag_1, ammo_amount_1
     ammoNeededToAdd = min(10 - mag_1, ammo_amount_1)
     mag_1 += ammoNeededToAdd
     ammo_amount_1 -= ammoNeededToAdd
-    UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
+    UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
 def reload_2():
     global mag_2, ammo_amount_2
     ammoNeededToAdd = min(15 - mag_2, ammo_amount_2)
     mag_2 += ammoNeededToAdd
     ammo_amount_2 -= ammoNeededToAdd
-    UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
+    UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
 def reload_3():
     global mag_3, ammo_amount_3
     ammoNeededToAdd = min(35 - mag_3, ammo_amount_3)
     mag_3 += ammoNeededToAdd
     ammo_amount_3 -= ammoNeededToAdd
-    UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
+    UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
 
 weaponToggle = False
 #BROKEN
@@ -524,13 +541,13 @@ def input(key):
             Bullet(color.black, position=camera.world_position + gun_NoModel.forward, rotation=camera.world_rotation)
             gun_NoModel.blink(color.white)
             mag_1 -= 1
-            UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
+            UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
             print(mag_1)
         elif weapon == 2 and mag_2 > 0:
             Bullet(color.green, position=camera.world_position + gun_NoModel_2.forward, rotation=camera.world_rotation)
             gun_NoModel_2.blink(color.white)
             mag_2 -= 1
-            UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
+            UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
             print(mag_2)
         elif weapon == 3:
             pass
@@ -607,7 +624,7 @@ followerSpeed = 3
 
 # the update functin runs 60 times per second. 
 def update():
-    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle, enable_gun_3
+    global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle, enable_gun_3, globalUIelementsColor
     if held_keys["shift"]:
         player.speed = 20
     else:
@@ -669,21 +686,31 @@ def update():
         gun_NoModel_3.enabled = False
         UI_Bullet_Counter_3.color = color.white
         UI_Bullet_Counter_2.color = color.white
-        UI_Bullet_Counter_1.color = color.green
+        UI_Bullet_Counter_1.color = globalUIelementsColor
+        UI_Bullet_Counter_1.enabled = True
+        UI_Bullet_Counter_2.enabled = False
+        UI_Bullet_Counter_3.enabled = False
+
     elif weapon == 2:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = True
         gun_NoModel_3.enabled = False
-        UI_Bullet_Counter_2.color = color.green
+        UI_Bullet_Counter_2.color = globalUIelementsColor
         UI_Bullet_Counter_1.color = color.white
         UI_Bullet_Counter_3.color = color.white
+        UI_Bullet_Counter_1.enabled = False
+        UI_Bullet_Counter_2.enabled = True
+        UI_Bullet_Counter_3.enabled = False
     elif weapon == 3 and enable_gun_3:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = False
         gun_NoModel_3.enabled = True
-        UI_Bullet_Counter_3.color = color.green
+        UI_Bullet_Counter_3.color = globalUIelementsColor
         UI_Bullet_Counter_2.color = color.white
         UI_Bullet_Counter_1.color = color.white
+        UI_Bullet_Counter_1.enabled = False
+        UI_Bullet_Counter_2.enabled = False
+        UI_Bullet_Counter_3.enabled = True
 
     if weapon > 3:
         weapon = 1
@@ -698,7 +725,7 @@ def update():
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
             gun_NoModel_3.blink(color.white)
             mag_3 -= 1
-            UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
+            UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
             print(mag_3)
             cooldown_timer = fireRate3
     if not enable_gun_3 and weapon == 3:
