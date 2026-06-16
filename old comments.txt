@@ -832,8 +832,26 @@ targetPosition = player.position + (player.forward * finalMoveDistance)
 ursfx([(0.0, 0.44), (0.14, 0.12), (0.34, 0.1), (0.64, 0.41), (0.96, 0.94)], volume=0.53, wave='sine', pitch=8, speed=2.7)
 
 
+ # bullet = Entity(parent=gun_NoModel, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+        # bullet = Entity(parent=camera, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+
+            # bullet_1.rotation = camera.world_rotation
+            # bullets_1.append(bullet_1)
 
 
+pistolPNG
+
+
+def reload_1():
+    global mag_1, ammo_amount_1
+    ammoNeeded = 10 - mag_1
+    if ammo_amount_1 >= ammoNeeded:
+        mag_1 += ammoNeeded
+        ammo_amount_1 -= ammoNeeded
+    else:
+        mag_1 += ammo_amount_1
+        ammo_amount_1 = 0
+    UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
 
 
 git add .
@@ -841,5 +859,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Rewrote the reload functions, and added a reserve ammo."
+git commit -m "Added comments for other people who are reading the code"
 git push

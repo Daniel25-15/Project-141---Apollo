@@ -32,6 +32,22 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                                 X                                
 """
 
+ascii_logo = """
+   _■■_    
+  (    )   
+ (      )  
+  \    /\  
+  /\  /  \ 
+ /  \/    \
+/   / \   /
+\  /   \ / 
+ \/     \  
+ (      )  
+  (    )   
+   -■■-    
+"""
+
+#the plane that everything is built on top of.
 ground = Entity(
     model='plane',
     texture='grass',
@@ -41,6 +57,7 @@ ground = Entity(
     collider='box'
 )
 
+# configurations for the skycolor
 sky = Sky()
 sky.texture = "radial_gradient"
 sky.color = color.red
@@ -50,7 +67,7 @@ sky.color = color.red
 # AmbientLight(color=color.rgba(0.3, 0.3, 0.3, 1))
 
 
-
+#definition for the lootbox for the unlocking entity for the weapon 3
 lootBox = Entity(
     model="cube",
     texture="brick",
@@ -60,7 +77,7 @@ lootBox = Entity(
     position=(8, 4.5, 12)
 )
 
-
+# defining the UI elements
 menu = Entity(
     parent=camera.ui,
     model="quad",
@@ -86,6 +103,8 @@ return_button = Button(
     parent=menu,
     z=-0.01
 )
+
+# defining the credits menu UI
 credits_button = Button(
     text="Credits",
     color=color.green,
@@ -148,7 +167,7 @@ def ADMIN_MENU_EXIT():
 
 UI_ADMIN_Exit.on_click = ADMIN_MENU_EXIT
 
-
+# class (or a builder) for all of the walls, to make them eisier to replicate more of them
 class Wall():
     def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all):
         self.entity = Entity(
@@ -162,7 +181,7 @@ class Wall():
         )
 
 # (x, y, z)
-
+# using the walls and actually building them
 def buildWalls():
     wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (5.5, 4.5, 10.5))
     wall2 = Wall("Wall2", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (9.5, 4.5, 14.5))
@@ -173,6 +192,8 @@ def buildWalls():
     wall7 = Wall("Wall7", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (8, 2, 12))
 
 buildWalls()
+
+# pre defining elements for later use, some of them are empty because they will have things added into them later
 
 bullets_1 = []
 bullets_2 = []
@@ -195,7 +216,9 @@ cooldown_timer = 0.0
 dummies = []
 followers = []
 
-gun_NoModel = Entity(parent=camera, model='pistol', color=color.gray, origin_y=-0.5, scale= (0.2, 0.2, 0.2), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), overlay=True, add_to_scene_entities=False, render_queue=1)
+#defining the 3 weapon types ( NOTE THESE WILL BE REPLACED EVENTUALLY WITH A CLASS or BUILDER for the weapons to make implementing different ones eisier)
+
+gun_NoModel = Entity(parent=camera, model='pistolModel', color=color.dark_gray, origin_y=-0.5, scale= (0.5, 0.5, 0.5), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), overlay=True, add_to_scene_entities=False, render_queue=1)
 gun_NoModel_2 = Entity(parent=camera, model='cube', color=color.green, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), overlay=True,)
 gun_NoModel_3 = Entity(parent=camera, model='Assault Rifle.glb', color=color.red, origin_y=-0.5, scale= (0.5, 0.5, 2), position= (2, -1, 2.5), rotation=(0, -110, 0), overlay=True,)
 gun_NoModel_2.enabled = False
@@ -208,6 +231,7 @@ gun_NoModel_3.collider = None
 gun_NoModel.intersects = False
 enable_gun_3 = False
 
+# defining the player, and giving it the pre built basic movement capabilites
 player = FirstPersonController(
     speed = 15,
     # model='sphere',
@@ -226,6 +250,7 @@ player.collider = 'sphere'
 # player.collider = BoxCollider(player, center=(0,1,0), size=(1.5, 2, 1.5))
 # player.slope_smoothing = 2 
 
+# Adding the weapon models to the player to show they are being held
 player.gun_1 = gun_NoModel
 player.gun_2 = gun_NoModel_2
 player.gun_3 = gun_NoModel_3
@@ -233,28 +258,47 @@ player.gun_3 = gun_NoModel_3
 player.ignore_list.append(gun_NoModel)
 
 # x, y, z = 5, 5, 6
-
+#defines the UI elements for each of the ammo counters that update when a bullet is shot
 UI_Bullet_Counter_1 = Text(
     text=f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}",
     scale=1,
-    position=(-0.85, 0.45),
+    position=(-0.8, 0.45),
     parent=camera.ui,
     color=color.white
+)
+UI_weapon_1_2d = Sprite(
+    scale=0.01,
+    position=(-0.85, 0.44),
+    parent=camera.ui,
+    texture="pistolPNG"
 )
 UI_Bullet_Counter_2 = Text(
     text=f"Ammo Gun 2: {mag_2}. Ammo Reserver {ammo_amount_2}",
     scale=1,
-    position=(-0.85, 0.40),
+    position=(-0.8, 0.40),
     parent=camera.ui,
     color=color.white
+)
+UI_weapon_2_2d = Sprite(
+    scale=0.01,
+    position=(-0.85, 0.39),
+    parent=camera.ui,
+    texture="pistolPNG"
 )
 UI_Bullet_Counter_3 = Text(
     text=f"Ammo Gun 3: {mag_3}. Ammo Reserver {ammo_amount_3}",
     scale=1,
-    position=(-0.85, 0.35),
+    position=(-0.8, 0.35),
     parent=camera.ui,
     color=color.white
 )
+UI_weapon_2_2d = Sprite(
+    scale=0.01,
+    position=(-0.85, 0.34),
+    parent=camera.ui,
+    texture="pistolPNG"
+)
+
 UI_Score_Counter = Text(
     text=f"Score: {global_score}",
     scale=1,
@@ -263,6 +307,7 @@ UI_Score_Counter = Text(
     color=color.white
 )
 
+# defines the UI elements for the health of the player that gets updated later
 UI_Health_Counter = Text(
     text=f"Health: {global_health}",
     scale=1.5,
@@ -271,6 +316,7 @@ UI_Health_Counter = Text(
     color=color.white
 )
 
+# handles the death function by reseting health, reseting score, and reseting player position
 def handleDeath():
     global global_score, global_health
     global_score = 0
@@ -290,6 +336,7 @@ def ExitCredits():
     mouse.locked = True
     player.enabled = True
 
+# was used to create randomly generated target dummies NOTE is not used anymore, but MIGHT come back later in an update.
 def generate_dummies():
     for i in range(9):
         x = random.choice([3, 4, 5, 6, 9])
@@ -306,8 +353,11 @@ generateNewFollowerToggle = False
 
 # generateFollowerEntity(3, 0, 0, 1)
 scale_var = 1
+
+# defines the follower generation, and adds each follower to a list. 
 def generateFollower():
-    for i in range(random.randint(5, 15)):
+    for i in range(random.randint(5, 15)): # generates a random integer of followers
+        # spaces each spawn for each follower out by taking a set integer, and then multiplying the number of followers by 3 to distance them
         spawn_x = 5 + (i * 3)
         follower = Entity(
             model="character",
@@ -319,6 +369,7 @@ def generateFollower():
             # texture="newmodel.png"
         )
         follower.speed = random.randint(2, 5)
+        # adds each follower to a list that is used later
         followers.append(follower)
         generateNewFollowerToggle = False
 
@@ -340,6 +391,7 @@ credits_button.on_click = showCredits
 CreditsMenuLeave.on_click = ExitCredits
 # quit_button.enabled = escape_menu_toggle
 
+# OLD CODE, UN USED
 def final_menu():
     global escape_menu_toggle
     escape_menu_toggle = True
@@ -351,7 +403,9 @@ def final_menu():
     if 'win_message' in globals():
         # destroy(win_message)
         pass
-
+# takes the distance given, and the amount the player is to be taken off of the ground, and then uses a raycast to check to position for any entities in the way
+# if there are entities it stops, if there arent, then the position where the player ends up is calculated by adding player position to the player moving forward for the distance, to get an integer
+# with that integer, the player is animated its movement so that it isnt a teleport, and moves to that position
 def dash(MoveDistance, raise_y):
     MoveDistance
     dashHitInfo = raycast(player.position + Vec3(0, 1, 0), player.forward, distance=MoveDistance, ignore=(player,))
@@ -367,6 +421,7 @@ def dash(MoveDistance, raise_y):
 
 weapon = 1
 
+# class or builder for the bullet entity that is used by every weapon. takes arguments to change the apperance of the bullet
 class Bullet(Entity):
     def __init__(self, color_def, **kwargs):
         super().__init__(
@@ -380,12 +435,14 @@ class Bullet(Entity):
         )
         self.speed = 400
         self.lifetime = 2.5
+    # has its own update function, because it needs to calculate the movement and path it needs to take
     def update(self):
         global global_score
         self.lifetime -= time.dt
         if self.lifetime <= 0:
             destroy(self)
             return
+        # checks for any collisions with the bullet, and then checks if those collisions are 'worth' triggering something else 
         distThisFrame = self.speed * time.dt
         hit_info = raycast(self.world_position, self.forward, distance=distThisFrame, ignore=(self, player))
 
@@ -405,6 +462,7 @@ class Bullet(Entity):
         else:
             self.position += self.forward * distThisFrame
 
+# takes the duration of the shake and the intesity, and for the duration, it moves the camera position in random directions with the intesity being the areas it can vary
 def cameraShake(duration=0.2, intensity=0.1):
     originalPosition = camera.position
     def executeShake(durationRemaining):
@@ -416,32 +474,28 @@ def cameraShake(duration=0.2, intensity=0.1):
             camera.position = originalPosition
     executeShake(duration)
 
+# handles the reloads for each weapon. each weapon takes the ammount of ammo its supposed to have, and subtracts that amount of ammo from the ammo reserve, and then resets the ammo it can. if you dont have enough for a full mag, then you get whatever you have left
 def reload_1():
     global mag_1, ammo_amount_1
-    if ammo_amount_1 >= 10:
-        mag_1 = 10
-        ammo_amount_1 -= 10
-    else:
-        mag_1 = ammo_amount_1
+    ammoNeededToAdd = min(10 - mag_1, ammo_amount_1)
+    mag_1 += ammoNeededToAdd
+    ammo_amount_1 -= ammoNeededToAdd
     UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
 def reload_2():
     global mag_2, ammo_amount_2
-    if ammo_amount_2 >= 15:
-        mag_2 = 15
-        ammo_amount_2 -= 15
-    else:
-        mag_2 = ammo_amount_2
+    ammoNeededToAdd = min(15 - mag_2, ammo_amount_2)
+    mag_2 += ammoNeededToAdd
+    ammo_amount_2 -= ammoNeededToAdd
     UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
 def reload_3():
     global mag_3, ammo_amount_3
-    if ammo_amount_3 >= 35:
-        mag_3 = 35
-        ammo_amount_3 -= 35
-    else:
-        mag_3 = ammo_amount_3
+    ammoNeededToAdd = min(35 - mag_3, ammo_amount_3)
+    mag_3 += ammoNeededToAdd
+    ammo_amount_3 -= ammoNeededToAdd
     UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
 
 weaponToggle = False
+#BROKEN
 def disableWeapon():
     global weaponToggle,weapon 
     print(f"DISABLED WEAPON: {weapon}")
@@ -450,6 +504,7 @@ def disableWeapon():
         if weapon == 1:
             gun_NoModel.enabled = False
 
+#handles all of the keyboard inputs that trigger other things (keybinds that trigger things)
 def input(key):
     # print(key)
     global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3, ammo_amount_1, ammo_amount_2, ammo_amount_3
@@ -463,16 +518,11 @@ def input(key):
         menu.enabled = escape_menu_toggle
 
 
-#                                                or key == 'left mouse down' and player.gun_2
     if key == 'left mouse down':
-        # bullet = Entity(parent=gun_NoModel, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
-        # bullet = Entity(parent=camera, model='cube', scale=.1, position=(0, 0.5, 0), speed = 3, color=color.red, collider='box')
+       # once the shoot button is clicked, the weapon is checked, and then the ammo count is checked. if both are in valid states, then the bullet fires. Otherwise the check breaks and nothing happens
         if weapon == 1 and mag_1 > 0:
             Bullet(color.black, position=camera.world_position + gun_NoModel.forward, rotation=camera.world_rotation)
-            # bullet_1.rotation = camera.world_rotation
-            # bullets_1.append(bullet_1)
             gun_NoModel.blink(color.white)
-
             mag_1 -= 1
             UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
             print(mag_1)
@@ -484,7 +534,7 @@ def input(key):
             print(mag_2)
         elif weapon == 3:
             pass
-        
+# if you ADS (Aim Down Sights) then the camera zooms in (NOTE THIS WILL BE REWORKED LATER) and then the gun model position shifts over to make it look more defined
     if key == 'right mouse down' and player.gun_3:
         camera.z = 5
         if weapon == 1:
@@ -503,6 +553,7 @@ def input(key):
         if weapon == 3:
             gun_NoModel_3.position = (2, -1, 2.5)
             gun_NoModel_3.rotation =(0, -90, 0)
+    # was an early form of weapon swapping
     if key == '1':
         weapon = 1
     if key == '2':
@@ -513,10 +564,10 @@ def input(key):
         camera.y = -0.5
     if key == 'control up' or key == 'left control up':
         camera.y = 0
-    # if key == 'c':
-    #     camera.y = 14
-    # if key == 'c up':
-    #     camera.y = 0
+    if key == 'c':
+        camera.y = 14
+    if key == 'c up':
+        camera.y = 0
     if key == 'z':
         dash(15, 1)
     if key == 'v':
@@ -554,6 +605,7 @@ print(f"PLAYER XT: {player.x}")
 
 followerSpeed = 3
 
+# the update functin runs 60 times per second. 
 def update():
     global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle, enable_gun_3
     if held_keys["shift"]:
@@ -744,10 +796,6 @@ def update():
         handleDeath()
 
     if len(followers) <= 0 and not generateNewFollowerToggle:
-        # print("NEW FOLLOWERS")
-        # spawning_wave = True
-        # invoke(generateFollower, delay=2.5)
-        # generateFollower()
         pass
 
     if len(dummies) == 0:
