@@ -121,6 +121,10 @@ mag_1 = 10
 mag_2 = 15
 mag_3 = 35
 
+ammo_amount_1 = 120
+ammo_amount_2 = 100
+ammo_amount_3 = 500
+
 global_score = 0
 global_health = 100
 
@@ -170,21 +174,21 @@ player.ignore_list.append(gun_NoModel)
 # x, y, z = 5, 5, 6
 
 UI_Bullet_Counter_1 = Text(
-    text=f"Ammo Gun 1: {mag_1}",
+    text=f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}",
     scale=1,
     position=(-0.85, 0.45),
     parent=camera.ui,
     color=color.white
 )
 UI_Bullet_Counter_2 = Text(
-    text=f"Ammo Gun 2: {mag_2}",
+    text=f"Ammo Gun 2: {mag_2}. Ammo Reserver {ammo_amount_2}",
     scale=1,
     position=(-0.85, 0.40),
     parent=camera.ui,
     color=color.white
 )
 UI_Bullet_Counter_3 = Text(
-    text=f"Ammo Gun 3: {mag_3}",
+    text=f"Ammo Gun 3: {mag_3}. Ammo Reserver {ammo_amount_3}",
     scale=1,
     position=(-0.85, 0.35),
     parent=camera.ui,
@@ -249,7 +253,7 @@ def generateFollower():
         followers.append(follower)
         generateNewFollowerToggle = False
 
-generateFollower()
+# generateFollower()
 
 
 
@@ -295,10 +299,11 @@ class Bullet(Entity):
     def __init__(self, color_def, **kwargs):
         super().__init__(
             parent=scene,
-            model='cube',
-            scale=0.1,
+            model='9mmbullet_model_final.glb',
+            scale=1,
             color=color_def,
             collider='box',
+            # texture="BulletTexture"
             **kwargs
         )
         self.speed = 400
@@ -329,14 +334,27 @@ class Bullet(Entity):
             self.position += self.forward * distThisFrame
 
 def reload_1():
-    global mag_1
-    mag_1 = 10;UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
+    global mag_1, ammo_amount_1
+    if ammo_amount_1 >= 10:
+        mag_1 = 10
+        ammo_amount_1 -= 10
+    else:
+        mag_1 = ammo_amount_1
+    UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
 def reload_2():
-    global mag_2
-    mag_2 = 15;UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
+    global mag_2, ammo_amount_2
+    if ammo_amount_2 >= 15:
+        mag_2 = 15
+    else:
+        mag_2 = ammo_amount_2
+    UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
 def reload_3():
-    global mag_3
-    mag_3 = 35;UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+    global mag_3, ammo_amount_3
+    if ammo_amount_3 >= 35:
+        mag_3 = 35
+    else:
+        mag_3 = ammo_amount_3
+    UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
 
 weaponToggle = False
 def disableWeapon():
@@ -349,7 +367,7 @@ def disableWeapon():
 
 def input(key):
     # print(key)
-    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3
+    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3, ammo_amount_1, ammo_amount_2, ammo_amount_3
     if key == 'escape':
         escape_menu_toggle = not escape_menu_toggle
         mouse.locked = not escape_menu_toggle
@@ -369,13 +387,13 @@ def input(key):
             gun_NoModel.blink(color.white)
 
             mag_1 -= 1
-            UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}"
+            UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
             print(mag_1)
         elif weapon == 2 and mag_2 > 0:
             Bullet(color.green, position=camera.world_position + gun_NoModel_2.forward, rotation=camera.world_rotation)
             gun_NoModel_2.blink(color.white)
             mag_2 -= 1
-            UI_Bullet_Counter_2.text = f"Ammo Gun 2: {mag_2}"
+            UI_Bullet_Counter_2.text = f"Ammo Gun 1: {mag_2}. Ammo Reserver {ammo_amount_2}"
             print(mag_2)
         elif weapon == 3:
             pass
@@ -539,7 +557,7 @@ def update():
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
             gun_NoModel_3.blink(color.white)
             mag_3 -= 1
-            UI_Bullet_Counter_3.text = f"Ammo Gun 3: {mag_3}"
+            UI_Bullet_Counter_3.text = f"Ammo Gun 1: {mag_3}. Ammo Reserver {ammo_amount_3}"
             print(mag_3)
             cooldown_timer = fireRate3
     if not enable_gun_3 and weapon == 3:

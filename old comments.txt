@@ -802,9 +802,6 @@ The gameplay mechanics of the game include:
 * **Reloading**: The player can reload the gun using the 'r' key.
 * **Menu**: The player can access the menu by pressing the escape key.
 
-
-
-
 for f in followers:
     f.add_script(SmoothFollow(target=player, offset=[0, 0, 0], speed=random.randint(2, 2)))
 
@@ -812,10 +809,15 @@ for f in followers:
 
 ursfx([(0.0, 0.44), (0.14, 0.12), (0.34, 0.1), (0.64, 0.41), (0.96, 0.94)], volume=0.53, wave='sine', pitch=8, speed=2.7)
 
+
+
+
+
+
 git add .
 git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Updated the 'Followers' AI, and rewrote some parts of it. Added raytracing to 3 different sides to stop it from getting stuck in some positions."
+git commit -m "Rewrote the reload functions, and added a reserve ammo."
 git push
