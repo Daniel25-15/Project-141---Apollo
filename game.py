@@ -249,7 +249,7 @@ def generateFollower():
         followers.append(follower)
         generateNewFollowerToggle = False
 
-# generateFollower()
+generateFollower()
 
 
 
@@ -408,6 +408,10 @@ def input(key):
         camera.y = -0.5
     if key == 'control up' or key == 'left control up':
         camera.y = 0
+    # if key == 'c':
+    #     camera.y = 14
+    # if key == 'c up':
+    #     camera.y = 0
     if key == 'z':
         dash(15, 1)
     if key == 'v':
@@ -558,10 +562,10 @@ def update():
                     continue
                 
                 distToSame = distance(f, otherF)
-                if distToSame < 1.2:
+                if distToSame < 1.0:
                     pushBack = f.position - otherF.position
                     if pushBack.length() > 0:
-                        moveVector += pushBack.normalized() * 1.5
+                        moveVector += pushBack.normalized() * 0.8
             moveVector = moveVector.normalized()
 
             move_x = playerDirection.x * time.dt * followerSpeed
@@ -573,9 +577,40 @@ def update():
                 distance=1.2,
                 ignore=(f, player)
             )
-            if not wallHitCheck.hit:
-                f.x += move_x
-                f.z += move_z
+
+            centerRaycastCheck = raycast(f.position + Vec3(0, 1, 0), direction=moveVector, distance=1.5, ignore=(f, player))
+            if centerRaycastCheck.hit:
+                wallNormal =  centerRaycastCheck.world_normal
+                wallNormal.y = 0
+                wallNormal = wallNormal.normalized()
+
+                dotProduct = moveVector.x * wallNormal.x + moveVector.z * wallNormal.z
+                slideVector = moveVector - (wallNormal * dotProduct)
+
+                if slideVector.length() > 0.1:
+                    moveVector = slideVector.normalized()
+                else:
+                    moveVector = Vec3(-wallNormal.z, 0, wallNormal.x)
+
+                left_direction = Vec3(moveVector.x - moveVector.z, 0, moveVector.z + moveVector.x).normalized()
+                right_direction = Vec3(moveVector.x + moveVector.z, 0, moveVector.z - moveVector.x).normalized()
+
+                leftHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=left_direction, distance=1.5, ignore=(f, player))
+                rightHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=right_direction, distance=1.5, ignore=(f, player))
+
+                if not leftHitCheck.hit:
+                    moveVector = left_direction
+                elif not rightHitCheck.hit:
+                    moveVector = right_direction
+                else:
+                    moveVector = Vec3(0, 0, 0)
+                
+            f.x += moveVector.x * time.dt * followerSpeed
+            f.z += moveVector.z * time.dt * followerSpeed
+
+            # if not wallHitCheck.hit:
+            #     f.x += move_x
+            #     f.z += move_z
 
             f.look_at(player)
             f.rotation_x = 0
@@ -603,6 +638,34 @@ def update():
     if len(dummies) == 0:
         # generate_dummies()
         pass
+
+logo = """
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XX■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■XX 
+   X■                                                       ■X   
+    X■■                                                   ■■X    
+     XX■                        ▄▓                       ■XX     
+       X■■                      █▓                     ■■X       
+        XX■                     █▓                    ■XX        
+          X■                 ███████▓                ■X          
+           X■■                  █▓                 ■■X           
+            XX■                 █▓                ■XX            
+              X■                █▓              ■■X              
+               X■■              █▓             ■XX               
+                XX■             █▓            ■X                 
+                  X■■           █▓          ■■X                  
+                   XX■          ▀          ■XX                   
+                     X■    +---------+    ■X                     
+                      X■■  |The Truth|  ■■X                      
+                       XX■ +---------+ ■XX                       
+                         X■■         ■■X                         
+                          XX■       ■XX                          
+                            X■     ■X                            
+                             X■■ ■■X                             
+                              XX■XX                              
+                                X                                
+"""
+print(logo)
 
 scene.colliders_visible = True
 app.run()

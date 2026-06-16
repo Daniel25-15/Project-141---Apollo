@@ -765,8 +765,48 @@ class RebuiltFirstPersonController(FirstPersonController):
             self.velocity_y = 0
             self.y = ceiling_hit.point.y - self.height
 
+Summary ---------------
 
 
+* **Walls and Ground**: The game has walls and a ground entity, which are created using the `Entity` class and have specific properties such as model, texture, scale, and collider.
+* **Player**: The player is a first-person controller that can move around and has a gun that can shoot bullets.
+* **Guns**: There are three guns in the game, each with its own properties such as model, position, and color. The player can switch between these guns using the number keys (1, 2, and 3).
+* **Bullets**: The bullets are entities that are created when the player shoots the gun. They have their own properties such as speed, lifetime, and collider.
+* **Dummies**: The dummies are entities that are spawned in the game world and can be shot by the player. They have their own properties such as model, texture, and collider.
+* **Followers**: The followers are entities that follow the player and can cause damage to the player if they get too close.
+* **UI**: The game has a user interface that displays information such as the player's health, score, and ammo count.
+* **Menu**: The game has a menu system that can be accessed by pressing the escape key.
+
+**Functions and Variables**
+
+The code includes various functions and variables, including:
+
+* `buildWalls()`: This function creates the walls in the game world.
+* `generate_dummies()`: This function generates the dummies in the game world.
+* `generateFollower()`: This function generates the followers in the game world.
+* `handleDeath()`: This function is called when the player dies and resets the player's position and health.
+* `input(key)`: This function handles user input, such as keyboard and mouse events.
+* `update()`: This function is called every frame and updates the game state, including the player's position, the bullets, and the followers.
+* `weapon`: This variable keeps track of the current gun that the player is using.
+* `mag_1`, `mag_2`, `mag_3`: These variables keep track of the ammo count for each gun.
+* `global_score`: This variable keeps track of the player's score.
+* `global_health`: This variable keeps track of the player's health.
+
+**Gameplay Mechanics**
+
+The gameplay mechanics of the game include:
+
+* **Movement**: The player can move around using the WASD keys or the arrow keys.
+* **Shooting**: The player can shoot bullets using the left mouse button.
+* **Switching Guns**: The player can switch between guns using the number keys (1, 2, and 3).
+* **Reloading**: The player can reload the gun using the 'r' key.
+* **Menu**: The player can access the menu by pressing the escape key.
+
+
+
+
+for f in followers:
+    f.add_script(SmoothFollow(target=player, offset=[0, 0, 0], speed=random.randint(2, 2)))
 
 
 
@@ -777,5 +817,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added a requirement to unlock the weapon 3. Tried to fix the same bug as last time, with the player being able to easily get stuck in the walls. Removed a 'Thickness = 2' attribute in the Wall class. "
+git commit -m "Updated the 'Followers' AI, and rewrote some parts of it. Added raytracing to 3 different sides to stop it from getting stuck in some positions."
 git push
