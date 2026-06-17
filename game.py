@@ -1,3 +1,6 @@
+# Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity, for whom without I can do nothing.
+# Romans 11:36
+
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 from ursina.shaders import lit_with_shadows_shader
@@ -216,6 +219,8 @@ cooldown_timer = 0.0
 dummies = []
 followers = []
 
+inventory = []
+
 #defining the 3 weapon types ( NOTE THESE WILL BE REPLACED EVENTUALLY WITH A CLASS or BUILDER for the weapons to make implementing different ones eisier)
 
 gun_NoModel = Entity(parent=camera, model='pistolModel', color=color.dark_gray, origin_y=-0.5, scale= (0.5, 0.5, 0.5), position= (1.5, -1.5, 2.5), rotation=(0, -90, 0), overlay=True, add_to_scene_entities=False, render_queue=1)
@@ -286,7 +291,7 @@ UI_weapon_2_2d = Sprite(
     scale=0.025,
     position=(0.3, -0.415),
     parent=camera.ui,
-    texture="pistolPNG"
+    texture="bulletsPNG"
 )
 UI_Bullet_Counter_3 = Text(
     text=f"Ammo: {mag_3}\nReserve: {ammo_amount_3}",
@@ -296,7 +301,7 @@ UI_Bullet_Counter_3 = Text(
     parent=camera.ui,
     color=globalUIelementsColor
 )
-UI_weapon_2_2d = Sprite(
+UI_weapon_3_2d = Sprite(
     scale=0.025,
     position=(0.3, -0.415),
     parent=camera.ui,
@@ -330,6 +335,15 @@ UI_health_2d = Sprite(
     position=(-0.825, -0.415),
     parent=camera.ui,
     texture="healthPNG"
+)
+
+lootBox_2 = Entity(
+    model="cube",
+    texture="scorePNG",
+    scale=1,
+    color=color.gold,
+    collider="box",
+    position=(12, 4.5, 12)
 )
 
 # handles the death function by reseting health, reseting score, and reseting player position
@@ -612,6 +626,16 @@ def input(key):
             if lootBoxRaycast.entity == lootBox:
                 lootBox.enabled = False
                 enable_gun_3 = True
+        ammoBoxRefillRaycast = raycast(camera.world_position, camera.forward, distance=10, ignore=(player,))
+        if ammoBoxRefillRaycast.hit:
+            if ammoBoxRefillRaycast.entity == lootBox_2:
+                print("CONNECTED")
+                ammo_amount_1 = 120
+                ammo_amount_2 = 100
+                ammo_amount_3 = 500
+                UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
+                UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
+                UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
 
 
 
@@ -690,6 +714,9 @@ def update():
         UI_Bullet_Counter_1.enabled = True
         UI_Bullet_Counter_2.enabled = False
         UI_Bullet_Counter_3.enabled = False
+        UI_weapon_1_2d.enabled = True
+        UI_weapon_2_2d.enabled = False
+        UI_weapon_3_2d.enabled = False
 
     elif weapon == 2:
         gun_NoModel.enabled = False
@@ -701,6 +728,9 @@ def update():
         UI_Bullet_Counter_1.enabled = False
         UI_Bullet_Counter_2.enabled = True
         UI_Bullet_Counter_3.enabled = False
+        UI_weapon_1_2d.enabled = False
+        UI_weapon_2_2d.enabled = True
+        UI_weapon_3_2d.enabled = False
     elif weapon == 3 and enable_gun_3:
         gun_NoModel.enabled = False
         gun_NoModel_2.enabled = False
@@ -711,6 +741,9 @@ def update():
         UI_Bullet_Counter_1.enabled = False
         UI_Bullet_Counter_2.enabled = False
         UI_Bullet_Counter_3.enabled = True
+        UI_weapon_1_2d.enabled = False
+        UI_weapon_2_2d.enabled = False
+        UI_weapon_3_2d.enabled = True
 
     if weapon > 3:
         weapon = 1
@@ -835,5 +868,3 @@ print(logo)
 scene.colliders_visible = True
 app.run()
 
-# Glory to God the Father, God the Son, and God the Holy Spirit, the one and only True God, the Holy Trinity, for whom without I can do nothing.
-# Romans 11:36
