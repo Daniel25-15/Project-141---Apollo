@@ -538,7 +538,7 @@ def disableWeapon():
 #handles all of the keyboard inputs that trigger other things (keybinds that trigger things)
 def input(key):
     # print(key)
-    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3, ammo_amount_1, ammo_amount_2, ammo_amount_3
+    global escape_menu_toggle, weapon, mag_1, mag_2, mag_3, admin_menu_toggle, enable_gun_3, ammo_amount_1, ammo_amount_2, ammo_amount_3, global_score
     if key == 'escape':
         escape_menu_toggle = not escape_menu_toggle
         mouse.locked = not escape_menu_toggle
@@ -549,7 +549,7 @@ def input(key):
         menu.enabled = escape_menu_toggle
 
 
-    if key == 'left mouse down':
+    if key == 'left mouse down' and not menu.enabled:
        # once the shoot button is clicked, the weapon is checked, and then the ammo count is checked. if both are in valid states, then the bullet fires. Otherwise the check breaks and nothing happens
         if weapon == 1 and mag_1 > 0:
             Bullet(color.black, position=camera.world_position + gun_NoModel.forward, rotation=camera.world_rotation)
@@ -566,7 +566,7 @@ def input(key):
         elif weapon == 3:
             pass
 # if you ADS (Aim Down Sights) then the camera zooms in (NOTE THIS WILL BE REWORKED LATER) and then the gun model position shifts over to make it look more defined
-    if key == 'right mouse down' and player.gun_3:
+    if key == 'right mouse down' and player.gun_3 and not menu.enabled:
         camera.z = 5
         if weapon == 1:
             gun_NoModel.position = (0.25, -1.5, 2.5)
@@ -595,15 +595,15 @@ def input(key):
         camera.y = -0.5
     if key == 'control up' or key == 'left control up':
         camera.y = 0
-    if key == 'c':
-        camera.y = 14
-    if key == 'c up':
-        camera.y = 0
-    if key == 'z':
+    # if key == 'c':
+    #     camera.y = 14
+    # if key == 'c up':
+    #     camera.y = 0
+    if key == 'z' and not menu.enabled:
         dash(15, 1)
-    if key == 'v':
+    if key == 'v' and not menu.enabled:
         dash(15, 0)
-    if key == 'r':
+    if key == 'r' and not menu.enabled:
         if weapon == 1:invoke(reload_1, delay=0.45)
         if weapon == 2:invoke(reload_2, delay=0.6)
         if weapon == 3:invoke(reload_3, delay=0.8)
@@ -620,22 +620,27 @@ def input(key):
         mouse.locked = not admin_menu_toggle
         player.enabled = not admin_menu_toggle
         UI_ADMIN_MENU.enabled = True
+    # if the player hits e, then a raycast (bassically, incredibly simplified, it is an invisible line coming from the players camera in this instance, and checks for any collisoins in a distance of 10) is used to find collisions
+    # if there is a collision, then check what that collision was. if it is something worth executing other code, it continues the code, and as of right now, if the score is greater than or equal to 30, it enables weapon 3, or checks the score variable, and if the score is greater than 15 it executes the next code section, and gives more ammo
     if key == 'e':
         lootBoxRaycast = raycast(camera.world_position, camera.forward, distance=10, ignore=(player,))
         if lootBoxRaycast.hit:
             if lootBoxRaycast.entity == lootBox:
-                lootBox.enabled = False
-                enable_gun_3 = True
+                if global_score >= 30:
+                    lootBox.enabled = False
+                    enable_gun_3 = True
         ammoBoxRefillRaycast = raycast(camera.world_position, camera.forward, distance=10, ignore=(player,))
         if ammoBoxRefillRaycast.hit:
             if ammoBoxRefillRaycast.entity == lootBox_2:
-                print("CONNECTED")
-                ammo_amount_1 = 120
-                ammo_amount_2 = 100
-                ammo_amount_3 = 500
-                UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
-                UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
-                UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
+                if global_score >= 15:
+                    global_score -= 15
+                    print("CONNECTED")
+                    ammo_amount_1 = 120
+                    ammo_amount_2 = 100
+                    ammo_amount_3 = 500
+                    UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
+                    UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
+                    UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
 
 
 

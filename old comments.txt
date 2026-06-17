@@ -859,5 +859,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Updated the UI positions, and finished adding the UI icons for now. Did a little bit of clean up of things."
+git commit -m "Added a ammo refil box, and fixed a bug with the UI not updating at certain executions."
 git push
