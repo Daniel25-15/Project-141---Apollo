@@ -403,7 +403,7 @@ def generateFollower():
         followers.append(follower)
         generateNewFollowerToggle = False
 
-# generateFollower()
+generateFollower()
 
 
 
@@ -504,6 +504,20 @@ def cameraShake(duration=0.2, intensity=0.1):
             camera.position = originalPosition
     executeShake(duration)
 
+healingAbilityBool = False
+
+def toggleHealingAbiltyBool():
+    global global_health
+    global_health = True
+    print("TOGGLED")
+
+def healingAbility():
+    global global_health, healingAbilityBool
+    if healingAbilityBool:
+        if global_health < 100 and global_health > 0:
+            global_health = 100
+            healingAbilityBool = False
+
 # handles the reloads for each weapon. each weapon takes the ammount of ammo its supposed to have, and subtracts that amount of ammo from the ammo reserve, and then resets the ammo it can. if you dont have enough for a full mag, then you get whatever you have left
 # takes the minimum between the max size minus the ammount currently in the mag, and the size in the reserve 
 def reload_1():
@@ -552,7 +566,7 @@ def input(key):
     if key == 'left mouse down' and not menu.enabled:
        # once the shoot button is clicked, the weapon is checked, and then the ammo count is checked. if both are in valid states, then the bullet fires. Otherwise the check breaks and nothing happens
         if weapon == 1 and mag_1 > 0:
-            Bullet(color.black, position=camera.world_position + gun_NoModel.forward, rotation=camera.world_rotation)
+            Bullet(color.black, position=camera.world_position + camera.forward, rotation=camera.world_rotation)
             gun_NoModel.blink(color.white)
             mag_1 -= 1
             UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
@@ -644,7 +658,6 @@ def input(key):
 
 
 
-
 print(f"CAMERA INT {camera.y}")
 print(f"PLAYER HEIGHT: {player.height}")
 print(f"PLAYER XT: {player.x}")
@@ -654,6 +667,7 @@ followerSpeed = 3
 # the update functin runs 60 times per second. 
 def update():
     global mag_3, cooldown_timer, fireRate3, weapon, global_health, followerSpeed, generateNewFollowerToggle, enable_gun_3, globalUIelementsColor
+    # Simple sprint script that increases the speed when shift is held down
     if held_keys["shift"]:
         player.speed = 20
     else:
@@ -661,7 +675,9 @@ def update():
 
     if cooldown_timer > 0:
         cooldown_timer -= time.dt
-        
+    
+    # attepted to stop the player from getting stuck inside of walls, but isn't completely functional, and the bug still exists
+    # NOTE not all of the code for stoping the player from getting stuck is my own orriginal code.
     move_input = Vec3(held_keys['d'] - held_keys['a'], 0, held_keys['w'] - held_keys['s'])
     origin = player.position + Vec3(0, 1, 0)
     if move_input.length() > 0:
@@ -709,6 +725,7 @@ def update():
         if hit2.hit and hasattr(hit2, 'distance') and hit2.distance < clearance:
             player.position += hit2.world_normal * (clearance - hit2.distance + 0.01)
 
+    # weapon swapping checks
     if weapon == 1:
         gun_NoModel.enabled = True
         gun_NoModel_2.enabled = False
@@ -750,6 +767,7 @@ def update():
         UI_weapon_2_2d.enabled = False
         UI_weapon_3_2d.enabled = True
 
+    # looping for the scrolling of switching weapons
     if weapon > 3:
         weapon = 1
     if weapon < 1:
@@ -757,7 +775,8 @@ def update():
 
     if global_health <= 0:
         handleDeath()
-
+    
+    # handles the automatic weapon 3 firing
     if held_keys["left mouse"] and weapon == 3  and mag_3 > 0 and enable_gun_3:
         if cooldown_timer <=0:
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
@@ -773,7 +792,9 @@ def update():
             # dummy.look_at(targetDummyPos)
             # dummy.look_at(player)
             pass
-    
+
+    # follower ai script that has them follow the player, and stops them from merging into 1 entity by using pushbacks, or hitboxes depending on how you see it
+    # has a whisker raycast feature to stop the followers from getting stuck on some walls. NOTE followers can still get stuck on some walls right now.
     for f in followers:
         playerDirection = player.position - f.position
         if playerDirection.length() > 1.5:
@@ -851,7 +872,7 @@ def update():
                 else:
                     finalKnockbackDistance = 3
                     knockbackLandPosition = player.position + (player.back * finalKnockbackDistance)
-                    player.animate_position(knockbackLandPosition, duration=0.275, curver=curve.linear)
+                    player.animate_position(knockbackLandPosition, duration=0.275, curve=curve.linear)
                 # player.position += playerDirection * -2
         if f.y <= -25:
             print("FELL OFF")
@@ -861,7 +882,9 @@ def update():
         handleDeath()
 
     if len(followers) <= 0 and not generateNewFollowerToggle:
-        pass
+        # pass
+        generateFollower()
+
 
     if len(dummies) == 0:
         # generate_dummies()

@@ -854,10 +854,27 @@ def reload_1():
     UI_Bullet_Counter_1.text = f"Ammo Gun 1: {mag_1}. Ammo Reserver {ammo_amount_1}"
 
 
+
+healingAbilityBool = False
+
+def toggleHealingAbiltyBool():
+    global global_health
+    global_health = True
+    print("TOGGLED")
+
+def healingAbility():
+    global global_health, healingAbilityBool
+    if healingAbilityBool:
+        if global_health < 100 and global_health > 0:
+            global_health = 100
+            healingAbilityBool = False
+
+
+
 git add .
 git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added a ammo refil box, and fixed a bug with the UI not updating at certain executions."
+git commit -m "Added checks for the pause menu, which fixed the bugs that allowed for built up moment to be executed all at once when the player un pauses. Stopped the ability to shoot while in the menu"
 git push
