@@ -504,19 +504,6 @@ def cameraShake(duration=0.2, intensity=0.1):
             camera.position = originalPosition
     executeShake(duration)
 
-healingAbilityBool = False
-
-def toggleHealingAbiltyBool():
-    global global_health
-    global_health = True
-    print("TOGGLED")
-
-def healingAbility():
-    global global_health, healingAbilityBool
-    if healingAbilityBool:
-        if global_health < 100 and global_health > 0:
-            global_health = 100
-            healingAbilityBool = False
 
 # handles the reloads for each weapon. each weapon takes the ammount of ammo its supposed to have, and subtracts that amount of ammo from the ammo reserve, and then resets the ammo it can. if you dont have enough for a full mag, then you get whatever you have left
 # takes the minimum between the max size minus the ammount currently in the mag, and the size in the reserve 
@@ -795,88 +782,89 @@ def update():
 
     # follower ai script that has them follow the player, and stops them from merging into 1 entity by using pushbacks, or hitboxes depending on how you see it
     # has a whisker raycast feature to stop the followers from getting stuck on some walls. NOTE followers can still get stuck on some walls right now.
-    for f in followers:
-        playerDirection = player.position - f.position
-        if playerDirection.length() > 1.5:
-            playerDirection = playerDirection.normalized()
+    if not menu.enabled:
+        for f in followers:
+            playerDirection = player.position - f.position
+            if playerDirection.length() > 1.5:
+                playerDirection = playerDirection.normalized()
 
-            moveVector = playerDirection
+                moveVector = playerDirection
 
-            for otherF in followers:
-                if otherF == f:
-                    continue
-                
-                distToSame = distance(f, otherF)
-                if distToSame < 1.0:
-                    pushBack = f.position - otherF.position
-                    if pushBack.length() > 0:
-                        moveVector += pushBack.normalized() * 0.8
-            moveVector = moveVector.normalized()
+                for otherF in followers:
+                    if otherF == f:
+                        continue
+                    
+                    distToSame = distance(f, otherF)
+                    if distToSame < 1.0:
+                        pushBack = f.position - otherF.position
+                        if pushBack.length() > 0:
+                            moveVector += pushBack.normalized() * 0.8
+                moveVector = moveVector.normalized()
 
-            move_x = playerDirection.x * time.dt * followerSpeed
-            move_z = playerDirection.z * time.dt * followerSpeed
+                move_x = playerDirection.x * time.dt * followerSpeed
+                move_z = playerDirection.z * time.dt * followerSpeed
 
-            wallHitCheck = raycast(
-                origin=f.position + Vec3(0, 1, 0),
-                direction=Vec3(playerDirection.x, 0, playerDirection.z),
-                distance=1.2,
-                ignore=(f, player)
-            )
+                wallHitCheck = raycast(
+                    origin=f.position + Vec3(0, 1, 0),
+                    direction=Vec3(playerDirection.x, 0, playerDirection.z),
+                    distance=1.2,
+                    ignore=(f, player)
+                )
 
-            centerRaycastCheck = raycast(f.position + Vec3(0, 1, 0), direction=moveVector, distance=1.5, ignore=(f, player))
-            if centerRaycastCheck.hit:
-                wallNormal =  centerRaycastCheck.world_normal
-                wallNormal.y = 0
-                wallNormal = wallNormal.normalized()
+                centerRaycastCheck = raycast(f.position + Vec3(0, 1, 0), direction=moveVector, distance=1.5, ignore=(f, player))
+                if centerRaycastCheck.hit:
+                    wallNormal =  centerRaycastCheck.world_normal
+                    wallNormal.y = 0
+                    wallNormal = wallNormal.normalized()
 
-                dotProduct = moveVector.x * wallNormal.x + moveVector.z * wallNormal.z
-                slideVector = moveVector - (wallNormal * dotProduct)
+                    dotProduct = moveVector.x * wallNormal.x + moveVector.z * wallNormal.z
+                    slideVector = moveVector - (wallNormal * dotProduct)
 
-                if slideVector.length() > 0.1:
-                    moveVector = slideVector.normalized()
-                else:
-                    moveVector = Vec3(-wallNormal.z, 0, wallNormal.x)
+                    if slideVector.length() > 0.1:
+                        moveVector = slideVector.normalized()
+                    else:
+                        moveVector = Vec3(-wallNormal.z, 0, wallNormal.x)
 
-                left_direction = Vec3(moveVector.x - moveVector.z, 0, moveVector.z + moveVector.x).normalized()
-                right_direction = Vec3(moveVector.x + moveVector.z, 0, moveVector.z - moveVector.x).normalized()
+                    left_direction = Vec3(moveVector.x - moveVector.z, 0, moveVector.z + moveVector.x).normalized()
+                    right_direction = Vec3(moveVector.x + moveVector.z, 0, moveVector.z - moveVector.x).normalized()
 
-                leftHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=left_direction, distance=1.5, ignore=(f, player))
-                rightHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=right_direction, distance=1.5, ignore=(f, player))
+                    leftHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=left_direction, distance=1.5, ignore=(f, player))
+                    rightHitCheck = raycast(f.position + Vec3(0, 1, 0), direction=right_direction, distance=1.5, ignore=(f, player))
 
-                if not leftHitCheck.hit:
-                    moveVector = left_direction
-                elif not rightHitCheck.hit:
-                    moveVector = right_direction
-                else:
-                    moveVector = Vec3(0, 0, 0)
-                
-            f.x += moveVector.x * time.dt * followerSpeed
-            f.z += moveVector.z * time.dt * followerSpeed
+                    if not leftHitCheck.hit:
+                        moveVector = left_direction
+                    elif not rightHitCheck.hit:
+                        moveVector = right_direction
+                    else:
+                        moveVector = Vec3(0, 0, 0)
+                    
+                f.x += moveVector.x * time.dt * followerSpeed
+                f.z += moveVector.z * time.dt * followerSpeed
 
-            # if not wallHitCheck.hit:
-            #     f.x += move_x
-            #     f.z += move_z
+                # if not wallHitCheck.hit:
+                #     f.x += move_x
+                #     f.z += move_z
 
-            f.look_at(player)
-            f.rotation_x = 0
-            f.rotation_z = 0
-            f.rotation_y += 90
-            if distance(f, player) < 1.5:
-                global_health -= 10
-                print(f"DAMAGED HEALTH: {global_health}")
-                UI_Health_Counter.text = f"Health: {global_health}"
-                cameraShake(0.05, 0.2)
-                knockbackCheck = raycast(player.position + Vec3(0, 1, 0), player.back, distance=3.25, ignore=(player,))
-                if knockbackCheck.hit:
-                    finalKnockbackDistance = knockbackCheck.distance - 0.5
-                else:
-                    finalKnockbackDistance = 3
-                    knockbackLandPosition = player.position + (player.back * finalKnockbackDistance)
-                    player.animate_position(knockbackLandPosition, duration=0.275, curve=curve.linear)
-                # player.position += playerDirection * -2
-        if f.y <= -25:
-            print("FELL OFF")
-            f.y = 0
+                f.look_at(player)
+                f.rotation_x = 0
+                f.rotation_z = 0
+                f.rotation_y += 90
+                if distance(f, player) < 1.5:
+                    global_health -= 10
+                    print(f"DAMAGED HEALTH: {global_health}")
+                    UI_Health_Counter.text = f"Health: {global_health}"
+                    cameraShake(0.05, 0.2)
+                    knockbackCheck = raycast(player.position + Vec3(0, 1, 0), player.back, distance=3.25, ignore=(player,))
+                    if knockbackCheck.hit:
+                        finalKnockbackDistance = knockbackCheck.distance - 0.5
+                    else:
+                        finalKnockbackDistance = 3
+                        knockbackLandPosition = player.position + (player.back * finalKnockbackDistance)
+                        player.animate_position(knockbackLandPosition, duration=0.275, curve=curve.linear)
+                    # player.position += playerDirection * -2
+            if f.y <= -25:
+                print("FELL OFF")
+                f.y = 0
     if player.y <= -25:
         print("TERRAIN TERRAIN")
         handleDeath()

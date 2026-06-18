@@ -876,5 +876,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Added checks for the pause menu, which fixed the bugs that allowed for built up moment to be executed all at once when the player un pauses. Stopped the ability to shoot while in the menu"
+git commit -m "finished adding comments"
 git push
