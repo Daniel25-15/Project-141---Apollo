@@ -870,11 +870,15 @@ def healingAbility():
             healingAbilityBool = False
 
 
+            # shotSound1.pitch = random.uniform(0.9, 1.1)
+            # shotSound1.play()
+# shotSound1 = Audio("gunshot1", autoplay=False, balance=False)
+
 
 git add .
 git commit -m "Changes"
 git push
 
 git add .
-git commit -m "Fixed a bug with the followers AI, which allowed them to move, even when the player was in the pause menu"
+git commit -m "compiled a version of the game to pen test."
 git push

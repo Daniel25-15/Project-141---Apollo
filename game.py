@@ -266,6 +266,9 @@ player.gun_3 = gun_NoModel_3
 
 player.ignore_list.append(gun_NoModel)
 
+shotSound1 = Audio("gunshot1", autoplay=False, balance=False)
+shotSoundEmpty1 = Audio("emptymag1", autoplay=False)
+
 # x, y, z = 5, 5, 6
 #defines the UI elements for each of the ammo counters that update when a bullet is shot
 UI_Bullet_Counter_1 = Text(
@@ -557,12 +560,20 @@ def input(key):
         if weapon == 1 and mag_1 > 0:
             Bullet(color.black, position=camera.world_position + camera.forward, rotation=camera.world_rotation)
             gun_NoModel.blink(color.white)
+            Audio("gunshot1", loop=False)
             mag_1 -= 1
             UI_Bullet_Counter_1.text = f"Ammo: {mag_1}\nReserve: {ammo_amount_1}"
             print(mag_1)
+        elif weapon == 1 and mag_1 <= 0:
+            shotSoundEmpty1.play()
+        elif weapon == 2 and mag_2 <= 0:
+            shotSoundEmpty1.play()
+        elif weapon == 3 and mag_3 <= 0:
+            shotSoundEmpty1.play()
         elif weapon == 2 and mag_2 > 0:
             Bullet(color.green, position=camera.world_position + gun_NoModel_2.forward, rotation=camera.world_rotation)
             gun_NoModel_2.blink(color.white)
+            Audio("gunshot1", loop=False)
             mag_2 -= 1
             UI_Bullet_Counter_2.text = f"Ammo: {mag_2}\nReserve: {ammo_amount_2}"
             print(mag_2)
@@ -632,6 +643,8 @@ def input(key):
                 if global_score >= 30:
                     lootBox.enabled = False
                     enable_gun_3 = True
+                    global_score -= 30
+                    UI_Score_Counter.text = f"Score: {global_score}"
         ammoBoxRefillRaycast = raycast(camera.world_position, camera.forward, distance=10, ignore=(player,))
         if ammoBoxRefillRaycast.hit:
             if ammoBoxRefillRaycast.entity == lootBox_2:
@@ -770,6 +783,7 @@ def update():
         if cooldown_timer <=0:
             Bullet(color.red, position=camera.world_position + camera.forward * 2, rotation=camera.world_rotation)
             gun_NoModel_3.blink(color.white)
+            Audio("gunshot1", loop=False)
             mag_3 -= 1
             UI_Bullet_Counter_3.text = f"Ammo: {mag_3}\nReserve: {ammo_amount_3}"
             print(mag_3)
