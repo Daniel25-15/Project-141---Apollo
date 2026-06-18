@@ -4,9 +4,11 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 from ursina.shaders import lit_with_shadows_shader
-import random, time
+import random, time, os, sys
 
 app = Ursina()
+
+# window.title = "Project 141 - Apollo"
 
 logo = """
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

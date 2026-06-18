@@ -876,5 +876,5 @@ git commit -m "Changes"
 git push
 
 git add .
-git commit -m "finished adding comments"
+git commit -m "Fixed a bug with the followers AI, which allowed them to move, even when the player was in the pause menu"
 git push
