@@ -174,7 +174,7 @@ UI_ADMIN_Exit.on_click = ADMIN_MENU_EXIT
 
 # class (or a builder) for all of the walls, to make them eisier to replicate more of them
 class Wall():
-    def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all):
+    def __init__(self,Name, model_type, texture_type, scale_def, color_def, texture_scale_def, collider_type, position_all, shader_def):
         self.entity = Entity(
             model=model_type,
             texture=texture_type,
@@ -183,20 +183,54 @@ class Wall():
             texture_scale=texture_scale_def,
             collider=collider_type,
             position=position_all,
+            shader=shader_def
         )
 
 # (x, y, z)
 # using the walls and actually building them
 def buildWalls():
-    wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (5.5, 4.5, 10.5))
-    wall2 = Wall("Wall2", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (9.5, 4.5, 14.5))
-    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (14.5, 4.5, 10.5))
-    wall4 = Wall("Wall4", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 0.5, 11))
-    wall5 = Wall("Wall5", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 1.5, 13))
-    wall6 = Wall("Wall6", 'cube', 'white_cube', (2, 3, 2), color.gray,  (1, 1), 'box', (11, 1.5, 13))
-    wall7 = Wall("Wall7", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (8, 2, 12))
+    # wall1 = Wall("Wall1", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (5.5, 4.5, 10.5))
+    # wall2 = Wall("Wall2", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (9.5, 4.5, 14.5))
+    # wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 9), color.gray,  (1, 1), 'box', (14.5, 4.5, 10.5))
+
+    # unlit_shader
+
+    wall4 = Wall("Wall4", 'cube', 'white_cube', (2, 1, 2), color.gray,  (1, 1), 'box', (13, 0.5, 11), "lit_with_shadows_shader")
+    wall5 = Wall("Wall5", 'cube', 'white_cube', (2, 2, 2), color.gray,  (1, 1), 'box', (13, 1.0, 13), "lit_with_shadows_shader")
+    wall6 = Wall("Wall6", 'cube', 'white_cube', (2, 3, 2), color.gray,  (1, 1), 'box', (11, 1.5, 13), "lit_with_shadows_shader")
+    wall7 = Wall("Wall7", 'cube', 'white_cube', (4, 4, 4), color.gray,  (1, 1), 'box', (8, 2, 12), "lit_with_shadows_shader")
+
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (5, 4.5, 100-10), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (35, 4.5, 100-30), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (9, 9, 1), color.gray,  (1, 1), 'box', (44, 4.5, 100-30), "lit_with_shadows_shader")
+
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (18, 9, 1), color.gray,  (1, 1), 'box', (141, 4.5, 149.5), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (18, 9, 1), color.gray,  (1, 1), 'box', (123, 4.5, 149.5), "lit_with_shadows_shader")
+
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 18), color.gray,  (1, 1), 'box', (149.5, 4.5, 123), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 18), color.gray,  (1, 1), 'box', (149.5, 4.5, 141), "lit_with_shadows_shader")
+
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (18, 9, 1), color.gray,  (1, 1), 'box', (141, 4.5, 123-8.5), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (18, 9, 1), color.gray,  (1, 1), 'box', (123, 4.5, 123-8.5), "lit_with_shadows_shader")
+
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 18), color.gray,  (1, 1), 'box', (114.5, 4.5, 141), "lit_with_shadows_shader")
+    wall3 = Wall("Wall3", 'cube', 'white_cube', (1, 9, 18), color.gray,  (1, 1), 'box', (114.5, 4.5, 123), "lit_with_shadows_shader")
+
+
+
+# sphereModel
+# lit_with_shadows_shader
 
 buildWalls()
+
+sphere = Entity(
+    model="sphereModel",
+    scale=1,
+    # color=color.dark_gray,
+    # texture_scale="cobblestone",
+    position=(15,-1,-15),
+    collider="box"
+)
 
 # pre defining elements for later use, some of them are empty because they will have things added into them later
 
@@ -242,7 +276,7 @@ globalUIelementsColor = color.black
 
 # defining the player, and giving it the pre built basic movement capabilites
 player = FirstPersonController(
-    speed = 15,
+    speed = 35,
     # model='sphere',
     model = None,
     y=0,
@@ -389,9 +423,13 @@ generateNewFollowerToggle = False
 # generateFollowerEntity(3, 0, 0, 1)
 scale_var = 1
 
+roundNum = 1
+baseNum = 5
 # defines the follower generation, and adds each follower to a list. 
 def generateFollower():
-    for i in range(random.randint(5, 15)): # generates a random integer of followers
+    global roundNum, baseNum
+    EntityNumRepeat = baseNum + round((roundNum * 1.1))
+    for i in range(EntityNumRepeat): # generates a random integer of followers
         # spaces each spawn for each follower out by taking a set integer, and then multiplying the number of followers by 3 to distance them
         spawn_x = 5 + (i * 3)
         follower = Entity(
@@ -401,12 +439,13 @@ def generateFollower():
             collider="box",
             # shader=lit_with_shadows_shader,
             # color=color.black,
-            # texture="newmodel.png"
+            # texture="character"
         )
         follower.speed = random.randint(2, 5)
         # adds each follower to a list that is used later
         followers.append(follower)
         generateNewFollowerToggle = False
+        roundNum += 1
 
 generateFollower()
 
@@ -817,16 +856,6 @@ def update():
                             moveVector += pushBack.normalized() * 0.8
                 moveVector = moveVector.normalized()
 
-                move_x = playerDirection.x * time.dt * followerSpeed
-                move_z = playerDirection.z * time.dt * followerSpeed
-
-                wallHitCheck = raycast(
-                    origin=f.position + Vec3(0, 1, 0),
-                    direction=Vec3(playerDirection.x, 0, playerDirection.z),
-                    distance=1.2,
-                    ignore=(f, player)
-                )
-
                 centerRaycastCheck = raycast(f.position + Vec3(0, 1, 0), direction=moveVector, distance=1.5, ignore=(f, player))
                 if centerRaycastCheck.hit:
                     wallNormal =  centerRaycastCheck.world_normal
@@ -857,10 +886,6 @@ def update():
                 f.x += moveVector.x * time.dt * followerSpeed
                 f.z += moveVector.z * time.dt * followerSpeed
 
-                # if not wallHitCheck.hit:
-                #     f.x += move_x
-                #     f.z += move_z
-
                 f.look_at(player)
                 f.rotation_x = 0
                 f.rotation_z = 0
@@ -881,12 +906,13 @@ def update():
             if f.y <= -25:
                 print("FELL OFF")
                 f.y = 0
+
     if player.y <= -25:
         print("TERRAIN TERRAIN")
         handleDeath()
 
     if len(followers) <= 0 and not generateNewFollowerToggle:
-        # pass
+        pass
         generateFollower()
 
 
